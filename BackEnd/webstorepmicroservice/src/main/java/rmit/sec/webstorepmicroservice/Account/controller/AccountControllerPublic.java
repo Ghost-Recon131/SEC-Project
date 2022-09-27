@@ -43,9 +43,6 @@ public class AccountControllerPublic {
     // Endpoint for login. Validate login credentials then return a JWT token if successful
     @PostMapping(path = "/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
-        System.err.println("Received username: " + loginRequest.getUsername());
-        System.err.println("Received password: " + loginRequest.getPassword());
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),

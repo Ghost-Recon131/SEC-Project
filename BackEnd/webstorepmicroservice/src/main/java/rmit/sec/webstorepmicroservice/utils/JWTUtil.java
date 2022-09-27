@@ -3,6 +3,7 @@ package rmit.sec.webstorepmicroservice.utils;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rmit.sec.webstorepmicroservice.Account.model.Account;
 import rmit.sec.webstorepmicroservice.Account.repository.AccountRepository;
@@ -16,7 +17,9 @@ import static rmit.sec.webstorepmicroservice.security.SecurityConstant.TOKEN_PRE
 @Service
 @AllArgsConstructor
 public class JWTUtil {
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
     private AccountRepository accountRepository;
     private final Logger logger = LogManager.getLogger(this.getClass());
 
