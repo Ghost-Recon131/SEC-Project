@@ -1,7 +1,6 @@
 package rmit.sec.webstorepmicroservice.Account.services;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import rmit.sec.webstorepmicroservice.Account.model.Account;
 import rmit.sec.webstorepmicroservice.Account.repository.AccountRepository;
 import rmit.sec.webstorepmicroservice.Account.requests.AccountRegisterRequest;
+import rmit.sec.webstorepmicroservice.Account.requests.ForgotPasswordRequest;
 import rmit.sec.webstorepmicroservice.utils.AccountRole;
 
 import java.util.UUID;
@@ -40,8 +40,23 @@ public class AccountService implements UserDetailsService {
         return accountRepository.getById(id);
     }
 
-    // Determine if an account exists by checking email address against DB
-    public boolean accountExists(String email){
+    // Determine if a given username is already associated with an account
+    public boolean usernameExists(String username){
+        boolean accountExists = false;
+        Account tmp = null;
+        try{
+            tmp = accountRepository.getAccountByUsername(username);
+            if(tmp != null){
+                accountExists = true;
+            }
+        }catch(Exception e){
+            logger.error(e);
+        }
+        return accountExists;
+    }
+
+    // Determine if a given email is already associated with an account
+    public boolean emailExists(String email){
         boolean accountExists = false;
         Account tmp = null;
         try{
@@ -58,10 +73,15 @@ public class AccountService implements UserDetailsService {
     // Create account & saves it to database, this method only creates a user account
     public String createAccount(AccountRegisterRequest request){
         String registerStatus = null;
-        boolean accountExists = accountExists(request.getEmail());
+        boolean usernameTaken = usernameExists(request.getUsername());
+        boolean emailTaken = emailExists(request.getEmail());
 
         // Only proceed if account is not already registered
-        if(!accountExists){
+        if(usernameTaken){
+            registerStatus = "Your username has been taken, please choose a different username";
+        }else if(emailTaken){
+            registerStatus = "Your email already exists, did you forget your password?";
+        }else{
             try{
                 UUID uuid = UUID.randomUUID();
                 String hashedPassword = bCryptPasswordEncoder.encode(request.getPassword());
@@ -82,19 +102,35 @@ public class AccountService implements UserDetailsService {
         return registerStatus;
     }
 
-    // TODO: update account details
-    public String updateAccount(){
-        return "TODO";
+    // Allow user to reset forgotten Password
+    public String forgotPassword(ForgotPasswordRequest request){
+        Account account = null;
+        String result = "";
+
+        if (usernameExists(request.getUsername())){
+            try{
+                account = accountRepository.getAccountByUsername(request.getUsername());
+
+                boolean secretQuestionMatch = account.getSecretQuestion().equals(request.getSecret_question());
+                String hashedSecretQuestionAnswer = bCryptPasswordEncoder.encode(request.getSecret_question_answer());
+                boolean getSecretQuestionAnswerMatch = account.getSecretQuestionAnswer().equals(hashedSecretQuestionAnswer);
+
+                if(secretQuestionMatch && getSecretQuestionAnswerMatch){
+                    String newPassword = bCryptPasswordEncoder.encode(request.getNewPassword());
+                    account.setPassword(newPassword);
+                    accountRepository.save(account);
+                }else{
+                    result = "The provided secret question and or answer to secret question is invalid.";
+                }
+            }catch (Exception e){
+                logger.error(e.getMessage());
+                result = "Exception occurred, password was not changed";
+            }
+        }else{
+            result = "The provided username does not exist";
+        }
+        return result;
     }
 
-    // TODO: Forgot Password
-    public String forgotPassword(){
-        return "TODO";
-    }
-
-    // TODO: Change Password
-    public String changePassword(){
-        return "TODO";
-    }
 
 }

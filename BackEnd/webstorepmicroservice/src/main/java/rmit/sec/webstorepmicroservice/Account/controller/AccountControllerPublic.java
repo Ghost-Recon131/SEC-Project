@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import rmit.sec.webstorepmicroservice.Account.requests.AccountRegisterRequest;
+import rmit.sec.webstorepmicroservice.Account.requests.ForgotPasswordRequest;
 import rmit.sec.webstorepmicroservice.Account.requests.LoginRequest;
 import rmit.sec.webstorepmicroservice.Account.services.AccountService;
 import rmit.sec.webstorepmicroservice.security.JWTLoginSucessReponse;
@@ -54,6 +55,12 @@ public class AccountControllerPublic {
         String jwt = TOKEN_PREFIX +  jwtTokenProvider.generateToken(authentication);
 
         return ResponseEntity.ok(new JWTLoginSucessReponse(true, jwt));
+    }
+
+    // Endpoint for resetting a forgotten password
+    @PostMapping(path = "/forgotPassword")
+    public String forgotPassword(@RequestBody ForgotPasswordRequest request){
+        return accountService.forgotPassword(request);
     }
 
 }
