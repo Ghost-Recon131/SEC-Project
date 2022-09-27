@@ -1,5 +1,6 @@
 package rmit.sec.webstorepmicroservice.Account.services;
 
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,12 +19,12 @@ import rmit.sec.webstorepmicroservice.utils.AccountRole;
 import java.util.UUID;
 
 @Service
-@NoArgsConstructor
+@AllArgsConstructor
 public class AccountService implements UserDetailsService {
     @Autowired
     private AccountRepository accountRepository;
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
