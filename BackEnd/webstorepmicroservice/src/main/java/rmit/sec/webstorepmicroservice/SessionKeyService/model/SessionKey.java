@@ -1,4 +1,4 @@
-package rmit.sec.webstorepmicroservice.DHKeyExchange.model;
+package rmit.sec.webstorepmicroservice.SessionKeyService.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,30 +14,16 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
-@Table(name = "DHKeyExchange")
-public class DHKeyExchange {
+@Table(name = "Session_Key")
+public class SessionKey {
 
     // SQL primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sessionkey_id")
     private Long sessionID;
-
-    // modulus value 'P'
-    @Column(name = "p")
-    private BigInteger publicKey;
-
-    // primitive root modulo of 'P'
-    @Column(name = "g")
-    private BigInteger publicKeyRootModulus;
-
-    // Secret integer 'A' for server
-    @Column(name = "a")
-    private BigInteger serverSecretKey;
-
-    // Established session key
     @Column(name = "session_key")
-    private BigInteger sessionKey;
+    private String sessionKey;
 
     // Date created
     @Column(name = "creation_date")
@@ -48,10 +34,7 @@ public class DHKeyExchange {
     private LocalDate expiryDate = creationDate.plusDays(1);
 
     // Constructor
-    public DHKeyExchange(BigInteger publicKey, BigInteger publicKeyRootModulus, BigInteger serverSecretKey, BigInteger sessionKey) {
-        this.publicKey = publicKey;
-        this.publicKeyRootModulus = publicKeyRootModulus;
-        this.serverSecretKey = serverSecretKey;
+    public SessionKey(String sessionKey) {
         this.sessionKey = sessionKey;
     }
 

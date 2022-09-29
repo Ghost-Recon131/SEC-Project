@@ -9,4 +9,8 @@ public class SecurityConstant {
     public static final String TOKEN_PREFIX= "Bearer ";
     public static final String HEADER_STRING = "Authorization";
 
+    // RSA key pair for server
+    public static final String RSA_PUBLIC = "server.rsa.publickey";
+    public static final String RSA_PRIVATE = "server.rsa.privatekey";
+
 }
