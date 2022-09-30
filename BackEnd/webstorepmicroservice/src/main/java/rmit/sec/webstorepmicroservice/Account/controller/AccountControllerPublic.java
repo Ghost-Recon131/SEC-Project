@@ -14,6 +14,7 @@ import rmit.sec.webstorepmicroservice.Account.requests.AccountRegisterRequest;
 import rmit.sec.webstorepmicroservice.Account.requests.ForgotPasswordRequest;
 import rmit.sec.webstorepmicroservice.Account.requests.LoginRequest;
 import rmit.sec.webstorepmicroservice.Account.services.AccountService;
+import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyService;
 import rmit.sec.webstorepmicroservice.security.JWTLoginSucessReponse;
 import rmit.sec.webstorepmicroservice.security.JwtTokenProvider;
 
@@ -32,22 +33,38 @@ public class AccountControllerPublic {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private SessionKeyService sessionKeyService;
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     // Endpoint for registering an account
     @PostMapping(path = "/register")
-    public String registerAccount(@RequestBody AccountRegisterRequest registerAccountRequest) {
-        return accountService.createAccount(registerAccountRequest);
+    public String registerAccount(@RequestParam Long sessionID, @RequestBody AccountRegisterRequest registerAccountRequest) {
+        // Decrypt the data
+        registerAccountRequest.setUsername(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getUsername()));
+        registerAccountRequest.setEmail(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getEmail()));
+        registerAccountRequest.setFirstname(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getFirstname()));
+        registerAccountRequest.setLastname(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getLastname()));
+        registerAccountRequest.setPassword(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getPassword()));
+        registerAccountRequest.setSecret_question(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getSecret_question()));
+        registerAccountRequest.setSecret_question_answer(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getSecret_question_answer()));
+
+        // Attempt to register the account then return the result
+        String result = accountService.createAccount(registerAccountRequest);
+        return sessionKeyService.aesEncryptMessage(sessionID, result);
     }
 
     // Endpoint for login. Validate login credentials then return a JWT token if successful
     @PostMapping(path = "/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> login(@RequestParam Long sessionID, @RequestBody LoginRequest loginRequest){
+        String decryptedUsername = sessionKeyService.aesDecryptMessage(sessionID, loginRequest.getUsername());
+        String decryptedPassword = sessionKeyService.aesDecryptMessage(sessionID, loginRequest.getPassword());
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
+                        decryptedUsername,
+                        decryptedPassword
                 )
         );
 
@@ -59,8 +76,16 @@ public class AccountControllerPublic {
 
     // Endpoint for resetting a forgotten password
     @PostMapping(path = "/forgotPassword")
-    public String forgotPassword(@RequestBody ForgotPasswordRequest request){
-        return accountService.forgotPassword(request);
+    public String forgotPassword(@RequestParam Long sessionID, @RequestBody ForgotPasswordRequest request){
+        // Decrypt the original request and then create a decrypted request to pass to accountService
+        ForgotPasswordRequest decryptedRequest = new ForgotPasswordRequest(
+                sessionKeyService.aesDecryptMessage(sessionID, request.getUsername()),
+                sessionKeyService.aesDecryptMessage(sessionID, request.getSecret_question()),
+                sessionKeyService.aesDecryptMessage(sessionID, request.getSecret_question_answer()),
+                sessionKeyService.aesDecryptMessage(sessionID, request.getNewPassword())
+        );
+
+        return accountService.forgotPassword(decryptedRequest);
     }
 
 }
