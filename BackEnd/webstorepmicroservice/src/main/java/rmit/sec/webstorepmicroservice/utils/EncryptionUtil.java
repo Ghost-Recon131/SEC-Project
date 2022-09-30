@@ -88,7 +88,7 @@ public class EncryptionUtil {
     public String serverAESEncrypt(String sessionKey, String plainText){
         String encryptedMessage = null;
         try {
-            SecretKey key = new SecretKeySpec(Base64.getDecoder().decode(sessionKey), "AES");
+            SecretKeySpec key = new SecretKeySpec(sessionKey.getBytes("UTF-8"), "AES");
 
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -106,7 +106,7 @@ public class EncryptionUtil {
     public String serverAESDecrypt(String sessionKey, String cipherText) {
         String decryptedMessage = null;
         try {
-            SecretKey key = new SecretKeySpec(Base64.getDecoder().decode(sessionKey), "AES");
+            SecretKeySpec key = new SecretKeySpec(sessionKey.getBytes("UTF-8"), "AES");
 
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, key);

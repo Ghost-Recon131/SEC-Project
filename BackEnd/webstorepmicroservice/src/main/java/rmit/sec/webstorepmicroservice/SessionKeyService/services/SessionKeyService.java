@@ -22,7 +22,8 @@ public class SessionKeyService {
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     // Temporary key for testing purposes
-    private final String tmpkey = "u/Gu5posvwDsXUnV5Zaq4g==";
+//    private final String tmpkey = "u/Gu5posvwDsXUnV5Zaq4g==";
+    private final String tmpkey = "PreachyImposing2";
 
     // Handles the key exchange process
     public Long keyExchange(String encryptedKey){
@@ -53,12 +54,28 @@ public class SessionKeyService {
 
     // Decrypt a message encrypted with the server's RSA public key
     public String aesDecryptMessage(Long sessionID, String encryptedMessage) {
-        return encryptionUtil.serverAESDecrypt(tmpkey, encryptedMessage);
+        String aesSessionKey = null;
+        try{
+            SessionKey sessionKeyObject = sessionKeyRepository.getBySessionID(sessionID);
+            aesSessionKey = sessionKeyObject.getSessionKey();
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            logger.warn("Possible failed to retrieve encryption key from DB");
+        }
+        return encryptionUtil.serverAESDecrypt(aesSessionKey, encryptedMessage);
     }
 
     // TEST METHOD
     public String aesEncryptMessage(Long sessionID, String plainText){
-        return encryptionUtil.serverAESEncrypt(tmpkey, plainText);
+        String aesSessionKey = null;
+        try{
+            SessionKey sessionKeyObject = sessionKeyRepository.getBySessionID(sessionID);
+            aesSessionKey = sessionKeyObject.getSessionKey();
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            logger.warn("Possible failed to retrieve encryption key from DB");
+        }
+        return encryptionUtil.serverAESEncrypt(aesSessionKey, plainText);
     }
 
     public String rsaEncryptMessage(String plainText){
