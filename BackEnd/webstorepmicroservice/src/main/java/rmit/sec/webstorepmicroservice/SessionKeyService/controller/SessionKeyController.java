@@ -20,6 +20,13 @@ public class SessionKeyController {
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
+    // Endpoint to initiate the key exchange from client
+    @PostMapping(path = "/keyExchange")
+    public Long keyExchange(@RequestBody EncryptedDataRequest encryptedDataRequest){
+        return sessionKeyService.keyExchange(encryptedDataRequest.getEncryptedData());
+    }
+
+
     // This endpoint is used to test decrypting message sent with encrypted data
     @GetMapping(path = "/aesDecrypt")
     public String serverAESDecrypt(@RequestBody EncryptedDataRequest request){

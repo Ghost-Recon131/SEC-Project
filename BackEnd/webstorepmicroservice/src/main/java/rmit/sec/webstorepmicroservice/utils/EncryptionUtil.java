@@ -22,14 +22,9 @@ import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLI
 @Service
 @AllArgsConstructor
 public class EncryptionUtil {
-    // RSA key pair for server
-
-
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     // TEST METHOD: handle RSA encryption
-
-    // This method will handle RSA Decryption
     public String serverRSAEncrypt(String plainText){
         String cipherText = null;
         try{
@@ -45,6 +40,7 @@ public class EncryptionUtil {
         return cipherText;
     }
 
+    // This method will handle RSA Decryption
     public String serverRSADecrypt(String cipherText){
         String plainText = null;
         try{
@@ -103,7 +99,6 @@ public class EncryptionUtil {
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-
         return encryptedMessage;
     }
 

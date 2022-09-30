@@ -24,6 +24,10 @@ public class SessionKey {
     @Column(name = "session_key")
     private String sessionKey;
 
+    // Used to keep track of initial key exchange, no use beyond that
+    @Column(name = "tmp_sessionID")
+    private Integer tmpSessionID;
+
     // Date created
     @Column(name = "creation_date")
     private LocalDate creationDate = LocalDate.now();
@@ -33,8 +37,9 @@ public class SessionKey {
     private LocalDate expiryDate = creationDate.plusDays(1);
 
     // Constructor
-    public SessionKey(String sessionKey) {
+    public SessionKey(String sessionKey, Integer tmpSessionID) {
         this.sessionKey = sessionKey;
+        this.tmpSessionID = tmpSessionID;
     }
 
 }

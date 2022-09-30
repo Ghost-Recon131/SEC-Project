@@ -7,4 +7,6 @@ import rmit.sec.webstorepmicroservice.SessionKeyService.model.SessionKey;
 @Repository
 public interface SessionKeyRepository extends JpaRepository<SessionKey, Long> {
     SessionKey getBySessionID(Long id);
+
+    SessionKey getSessionKeyByTmpSessionID(Integer tmp);
 }
