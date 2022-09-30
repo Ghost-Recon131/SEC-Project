@@ -20,13 +20,23 @@ public class SessionKeyService {
     private final String tmpkey = "u/Gu5posvwDsXUnV5Zaq4g==";
 
     // Decrypt a message encrypted with the server's RSA public key
-    public String decryptMessage(Long sessionID, String encryptedMessage) {
+    public String aesDecryptMessage(Long sessionID, String encryptedMessage) {
         return encryptionUtil.serverAESDecrypt(tmpkey, encryptedMessage);
     }
 
     // TEST METHOD
-    public String encryptMessage(Long sessionID, String plainText){
+    public String aesEncryptMessage(Long sessionID, String plainText){
         return encryptionUtil.serverAESEncrypt(tmpkey, plainText);
     }
+
+    public String rsaEncryptMessage(String plainText){
+        return encryptionUtil.serverRSAEncrypt(plainText);
+    }
+
+    public String rsaDecryptMessage(String plainText){
+        return encryptionUtil.serverRSADecrypt(plainText);
+    }
+
+
 
 }

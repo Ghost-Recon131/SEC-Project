@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
 import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PRIVATE;
 import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLIC;
 
@@ -23,6 +22,8 @@ import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLI
 @Service
 @AllArgsConstructor
 public class EncryptionUtil {
+    // RSA key pair for server
+
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
@@ -42,6 +43,22 @@ public class EncryptionUtil {
             logger.error(e.getMessage());
         }
         return cipherText;
+    }
+
+    public String serverRSADecrypt(String cipherText){
+        String plainText = null;
+        try{
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+
+            cipher.init(Cipher.DECRYPT_MODE, getPrivateKey(RSA_PRIVATE));
+
+            byte[] decryptedValue = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+
+            plainText = new String(decryptedValue);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+        return plainText;
     }
 
     // Supporting methods to get the public and private key for the server
