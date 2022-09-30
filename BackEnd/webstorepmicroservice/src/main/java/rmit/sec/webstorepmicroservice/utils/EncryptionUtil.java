@@ -1,6 +1,12 @@
 package rmit.sec.webstorepmicroservice.utils;
 
 import lombok.AllArgsConstructor;
+
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +16,9 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PRIVATE;
+import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLIC;
+
 
 @Service
 @AllArgsConstructor
@@ -17,23 +26,50 @@ public class EncryptionUtil {
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
-    // Run the provided JS code inside our java program
-//    public String serverRSADecrypt(String encryptedMessage) {
-//        ScriptEngine jsRuntime = null;
-//        String decryptedMessage = null;
-//        try {
-//            jsRuntime = new ScriptEngineManager().getEngineByName("src/main/resources/encryptionLinker.js");
-//            Invocable jsFunction = (Invocable) jsRuntime;
-//
-//            //function RSA_encryption(message, publicKey)
-//            decryptedMessage = jsFunction.invokeFunction("RSA_decryption", encryptedMessage, RSA_PUBLIC).toString();
-//
-//            System.err.println("Result: " + decryptedMessage);
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//        }
-//        return decryptedMessage;
-//    }
+    // TEST METHOD: handle RSA encryption
+
+    // This method will handle RSA Decryption
+    public String serverRSAEncrypt(String plainText){
+        String cipherText = null;
+        try{
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, getPublicKey(RSA_PUBLIC));
+
+            byte[] encryptedValue = cipher.doFinal(plainText.getBytes());
+
+            cipherText = Base64.getEncoder().encodeToString(encryptedValue);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+        return cipherText;
+    }
+
+    // Supporting methods to get the public and private key for the server
+    public PublicKey getPublicKey(String publicKeyString){
+        PublicKey publicKey = null;
+        try{
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyString.getBytes()));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            publicKey = keyFactory.generatePublic(keySpec);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+        return publicKey;
+    }
+
+     private PrivateKey getPrivateKey(String privateKeyString){
+        PrivateKey privateKey = null;
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString.getBytes()));
+        KeyFactory keyFactory = null;
+        try {
+            keyFactory = KeyFactory.getInstance("RSA");
+            privateKey = keyFactory.generatePrivate(keySpec);
+
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+        return privateKey;
+    }
 
     // This method will encrypt data with using an agreed upon session key
     public String serverAESEncrypt(String sessionKey, String plainText){
