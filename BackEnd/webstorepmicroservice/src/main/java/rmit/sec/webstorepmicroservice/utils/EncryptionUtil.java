@@ -2,7 +2,9 @@ package rmit.sec.webstorepmicroservice.utils;
 
 import lombok.AllArgsConstructor;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -13,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PRIVATE;
 import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLIC;
@@ -28,11 +29,12 @@ public class EncryptionUtil {
     public String serverRSAEncrypt(String plainText){
         String cipherText = null;
         try{
+            // Select RSA algorithm then get the key & cipher
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, getPublicKey(RSA_PUBLIC));
 
+            // Perform the encryption and encode ciphertext to base64, then return as normal string
             byte[] encryptedValue = cipher.doFinal(plainText.getBytes());
-
             cipherText = Base64.getEncoder().encodeToString(encryptedValue);
         }catch (Exception e){
             logger.error(e.getMessage());
@@ -44,12 +46,12 @@ public class EncryptionUtil {
     public String serverRSADecrypt(String cipherText){
         String plainText = null;
         try{
+            // Select RSA algorithm then get the key & cipher
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-
             cipher.init(Cipher.DECRYPT_MODE, getPrivateKey(RSA_PRIVATE));
 
+            // Perform the decryption and decode to base64 and return plaintext as normal string
             byte[] decryptedValue = cipher.doFinal(Base64.getDecoder().decode(cipherText));
-
             plainText = new String(decryptedValue);
         }catch (Exception e){
             logger.error(e.getMessage());
@@ -78,7 +80,6 @@ public class EncryptionUtil {
         try {
             keyFactory = KeyFactory.getInstance("RSA");
             privateKey = keyFactory.generatePrivate(keySpec);
-
         }catch (Exception e){
             logger.error(e.getMessage());
         }
@@ -89,13 +90,17 @@ public class EncryptionUtil {
     public String serverAESEncrypt(String sessionKey, String plainText){
         String encryptedMessage = null;
         try {
-            SecretKeySpec key = new SecretKeySpec(sessionKey.getBytes("UTF-8"), "AES");
+            // Hash the original key with SHA-256 so the length and contents does not matter
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            byte[] hashedKey = messageDigest.digest(sessionKey.getBytes(StandardCharsets.UTF_8));
 
+            // Generate the encryption key
+            SecretKeySpec encryptionKey = new SecretKeySpec(hashedKey, "AES");
             Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
+            cipher.init(Cipher.ENCRYPT_MODE, encryptionKey);
 
+            // Encrypt the plaintext then encode it to base64 and return as normal string
             byte[] encryptedValue = cipher.doFinal(plainText.getBytes());
-
             encryptedMessage = Base64.getEncoder().encodeToString(encryptedValue);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -107,14 +112,18 @@ public class EncryptionUtil {
     public String serverAESDecrypt(String sessionKey, String cipherText) {
         String decryptedMessage = null;
         try {
-            SecretKeySpec key = new SecretKeySpec(sessionKey.getBytes("UTF-8"), "AES");
+            // Hash the original key with SHA-256 so the length and contents does not matter
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            byte[] hashedKey = messageDigest.digest(sessionKey.getBytes(StandardCharsets.UTF_8));
 
+            // Generate the decryption key used for AES
+            SecretKeySpec decryptionKey = new SecretKeySpec(hashedKey, "AES");
             Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, key);
+            cipher.init(Cipher.DECRYPT_MODE, decryptionKey);
 
+            // Decrypt the cipher text and decode it to a normal string
             byte[] decodeBase64 = Base64.getDecoder().decode(cipherText);
             byte[] decryptedVal = cipher.doFinal(decodeBase64);
-
             decryptedMessage = new String(decryptedVal);
         } catch (Exception e) {
             logger.error(e.getMessage());
