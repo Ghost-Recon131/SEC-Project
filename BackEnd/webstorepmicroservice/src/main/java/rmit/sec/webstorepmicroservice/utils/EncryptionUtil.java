@@ -24,7 +24,7 @@ import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLI
 public class EncryptionUtil {
     private final Logger logger = LogManager.getLogger(this.getClass());
 
-    // TEST METHOD: handle RSA encryption
+    // Handle RSA encryption
     public String serverRSAEncrypt(String plainText){
         String cipherText = null;
         try{
@@ -40,7 +40,7 @@ public class EncryptionUtil {
         return cipherText;
     }
 
-    // This method will handle RSA Decryption
+    // Handle RSA Decryption
     public String serverRSADecrypt(String cipherText){
         String plainText = null;
         try{
@@ -70,6 +70,7 @@ public class EncryptionUtil {
         return publicKey;
     }
 
+    // Calculates the actual encryption key used for AES encryption
      private PrivateKey getPrivateKey(String privateKeyString){
         PrivateKey privateKey = null;
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString.getBytes()));

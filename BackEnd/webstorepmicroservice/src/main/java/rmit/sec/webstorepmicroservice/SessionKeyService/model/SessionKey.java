@@ -21,7 +21,7 @@ public class SessionKey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sessionkey_id")
     private Long sessionID;
-    @Column(name = "session_key")
+    @Column(name = "session_key", length = 10000)
     private String sessionKey;
 
     // Used to keep track of initial key exchange, no use beyond that

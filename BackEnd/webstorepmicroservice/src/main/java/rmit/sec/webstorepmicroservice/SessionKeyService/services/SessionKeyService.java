@@ -36,7 +36,9 @@ public class SessionKeyService {
 
         // Store new session in database if decryption is successful
         if(decryptedKey != null && !decryptedKey.isEmpty()){
-            SessionKey sessionKey = new SessionKey(decryptedKey, tmpSessionID);
+            String securedSessionKey = encryptionUtil.serverRSAEncrypt(decryptedKey);
+
+            SessionKey sessionKey = new SessionKey(securedSessionKey, tmpSessionID);
             sessionKeyRepository.save(sessionKey);
 
             // Retrieve the sessionID from DB and return it to client
@@ -57,7 +59,7 @@ public class SessionKeyService {
         String aesSessionKey = null;
         try{
             SessionKey sessionKeyObject = sessionKeyRepository.getBySessionID(sessionID);
-            aesSessionKey = sessionKeyObject.getSessionKey();
+            aesSessionKey = encryptionUtil.serverRSADecrypt(sessionKeyObject.getSessionKey());
         }catch (Exception e){
             logger.error(e.getMessage());
             logger.warn("Possible failed to retrieve encryption key from DB");
@@ -70,7 +72,7 @@ public class SessionKeyService {
         String aesSessionKey = null;
         try{
             SessionKey sessionKeyObject = sessionKeyRepository.getBySessionID(sessionID);
-            aesSessionKey = sessionKeyObject.getSessionKey();
+            aesSessionKey = encryptionUtil.serverRSADecrypt(sessionKeyObject.getSessionKey());
         }catch (Exception e){
             logger.error(e.getMessage());
             logger.warn("Possible failed to retrieve encryption key from DB");
@@ -78,10 +80,12 @@ public class SessionKeyService {
         return encryptionUtil.serverAESEncrypt(aesSessionKey, plainText);
     }
 
+    // Performs RSA encryption using the server's public key
     public String rsaEncryptMessage(String plainText){
         return encryptionUtil.serverRSAEncrypt(plainText);
     }
 
+    // Performs RSA encryption using the server's private key
     public String rsaDecryptMessage(String plainText){
         return encryptionUtil.serverRSADecrypt(plainText);
     }
