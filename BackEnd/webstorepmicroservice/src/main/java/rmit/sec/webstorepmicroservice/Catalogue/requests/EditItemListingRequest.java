@@ -10,7 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class EditItemListingRequest {
     private Long itemID;
-    private Long sellerID;
     private String itemName;
     private String itemDescription;
     private Boolean itemAvailable;
