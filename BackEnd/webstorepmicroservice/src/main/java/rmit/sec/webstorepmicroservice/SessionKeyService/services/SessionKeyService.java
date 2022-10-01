@@ -14,16 +14,12 @@ import java.util.Random;
 @Service
 @AllArgsConstructor
 public class SessionKeyService {
-//    private SecureRandom secureRandom;
+
     @Autowired
     private EncryptionUtil encryptionUtil;
     @Autowired
     private SessionKeyRepository sessionKeyRepository;
     private final Logger logger = LogManager.getLogger(this.getClass());
-
-    // Temporary key for testing purposes
-//    private final String tmpkey = "u/Gu5posvwDsXUnV5Zaq4g==";
-    private final String tmpkey = "PreachyImposing2";
 
     // Handles the key exchange process
     public Long keyExchange(String encryptedKey){

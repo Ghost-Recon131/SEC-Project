@@ -14,7 +14,6 @@ import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyServi
 @RequestMapping("/api/sessionKeyService")
 @AllArgsConstructor
 public class SessionKeyController {
-    // TODO
     @Autowired
     private SessionKeyService sessionKeyService;
 
