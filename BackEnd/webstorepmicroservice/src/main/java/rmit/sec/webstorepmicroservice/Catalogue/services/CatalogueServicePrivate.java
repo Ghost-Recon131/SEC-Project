@@ -5,61 +5,64 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rmit.sec.webstorepmicroservice.Catalogue.customObjects.EncryptedCatalogueItem;
 import rmit.sec.webstorepmicroservice.Catalogue.model.CatalogueItem;
 import rmit.sec.webstorepmicroservice.Catalogue.repository.CatalogueItemRepository;
-import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
+import rmit.sec.webstorepmicroservice.Catalogue.requests.EditItemListingRequest;
+import rmit.sec.webstorepmicroservice.Catalogue.requests.ItemListingRequest;
+import rmit.sec.webstorepmicroservice.utils.ItemCatagory;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class CatalogueServicePrivate {
     @Autowired
     private CatalogueItemRepository catalogueItemRepository;
-    @Autowired
-    private EncryptionUtil encryptionUtil;
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
-    // Get all items in the catalogue
-    private List<EncryptedCatalogueItem> getAllItems(String sessionKey) {
-        List<CatalogueItem> allItems = catalogueItemRepository.findAll();
-        return encryptCatalogueItems(sessionKey, allItems);
-    }
-
-    // TODO: getCatalogueItemsBySellerID
-
-    // TODO: getCatalogueItemsByItemCategory
-
-    // TODO: getCatalogueItemsByItemAvailable
-
-
-    // Convert provided list of CatalogueItems to encrypted form
-    private List<EncryptedCatalogueItem> encryptCatalogueItems(String sessionKey, List<CatalogueItem> items) {
-        List<EncryptedCatalogueItem> encryptedCatalogueItems = new ArrayList<>();
+    // List new item
+    public String listItem(ItemListingRequest request) {
+        String result = "";
+        CatalogueItem newItem = null;
         try{
-            // Encrypt fields of each item then add to another arraylist
-            for (CatalogueItem catalogueItem : items) {
-                EncryptedCatalogueItem encryptedCatalogueItem = new EncryptedCatalogueItem(
-                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemID().toString()),
-                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getSellerID().toString()),
-                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemName()),
-                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemDescription()),
-                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemAvailable().toString()),
-                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemPrice().toString()),
-                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemQuantity().toString()),
-                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemImage()),
-                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemCategory().toString())
-                );
-                encryptedCatalogueItems.add(encryptedCatalogueItem);
+            newItem = new CatalogueItem(
+                    request.getSellerID(),
+                    request.getItemName(),
+                    request.getItemDescription(),
+                    Boolean.FALSE,
+                    request.getItemPrice(),
+                    request.getItemQuantity(),
+                    null,
+                    ItemCatagory.valueOf(request.getItemCategory().toUpperCase())
+            );
+            // Set item as available only if the specified quantity is greater than 0 or "-1" which denotes unlimited quantity
+            if (request.getItemQuantity() == -1 || request.getItemQuantity() > 0) {
+                newItem.setItemAvailable(Boolean.TRUE);
             }
+            catalogueItemRepository.save(newItem);
+            result = "Successfully listed item";
         }catch (Exception e){
-            logger.error("Error returning list of all items \n");
+            result = "Failed to listed item";
+            logger.warn("Error listing new item");
             logger.error(e.getMessage());
         }
-        return encryptedCatalogueItems;
+        return result;
     }
+
+    // TODO: Edit item
+    public String editItem(EditItemListingRequest request) {
+        String result = "";
+        CatalogueItem toEdit = null;
+        try{
+            toEdit = catalogueItemRepository.getCatalogueItemByItemID(request.getItemID());
+        }catch (Exception e){
+            result = "Failed to edit item listing";
+            logger.error(e.getMessage());
+        }
+
+        return result;
+    }
+
+    // TODO: Purchase item
 
 }
