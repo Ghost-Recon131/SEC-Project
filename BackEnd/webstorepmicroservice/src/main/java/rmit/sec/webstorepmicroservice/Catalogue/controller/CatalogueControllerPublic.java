@@ -15,38 +15,38 @@ import java.util.List;
 @AllArgsConstructor
 public class CatalogueControllerPublic {
     @Autowired
-    private CatalogueServicePublic catalogueControllerPublic;
+    private CatalogueServicePublic catalogueServicePublic;
     @Autowired
     private SessionKeyService sessionKeyService;
 
     // Get single item by its ID
     @GetMapping("/item/{id}")
     public EncryptedCatalogueItem getItemByID(@RequestParam Long itemID, @RequestParam Long sessionKey) {
-        return catalogueControllerPublic.getItemByID(sessionKey, itemID);
+        return catalogueServicePublic.getItemByID(sessionKey, itemID);
     }
 
     // Get all items from backend
     @GetMapping(path = "/allItems")
     public List<EncryptedCatalogueItem> viewAllItems(@RequestParam Long sessionID) {
-        return catalogueControllerPublic.getAllItems(sessionKeyService.getAESKey(sessionID));
+        return catalogueServicePublic.getAllItems(sessionKeyService.getAESKey(sessionID));
     }
 
     // Get all items listed by a particular seller
     @GetMapping(path = "/allItemsBySeller")
     public List<EncryptedCatalogueItem> viewItemsBySellerID(@RequestParam Long sessionID, @RequestParam Long sellerID) {
-        return catalogueControllerPublic.getItemsBySellerID(sessionKeyService.getAESKey(sessionID), sellerID);
+        return catalogueServicePublic.getItemsBySellerID(sessionKeyService.getAESKey(sessionID), sellerID);
     }
 
     // Get items by its category
     @GetMapping(path = "/allItemsByCategory")
     public List<EncryptedCatalogueItem> viewItemsByCategory(@RequestParam Long sessionID, @RequestParam String category) {
-        return catalogueControllerPublic.getItemsByCategory(sessionKeyService.getAESKey(sessionID), category);
+        return catalogueServicePublic.getItemsByCategory(sessionKeyService.getAESKey(sessionID), category);
     }
 
     // Get all available items
     @GetMapping(path = "/allAvailableItems")
     public List<EncryptedCatalogueItem> viewAllAvailableItems(@RequestParam Long sessionID) {
-        return catalogueControllerPublic.getAvailableItems(sessionKeyService.getAESKey(sessionID));
+        return catalogueServicePublic.getAvailableItems(sessionKeyService.getAESKey(sessionID));
     }
 
 }
