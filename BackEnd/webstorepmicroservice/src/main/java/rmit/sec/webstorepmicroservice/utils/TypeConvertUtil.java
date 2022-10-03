@@ -54,4 +54,20 @@ public class TypeConvertUtil {
         return converted;
     }
 
+    // Frontend will send 0 to indicate false and 1 to indicate true
+    public Boolean convertToBoolean(String toConvert){
+        Boolean converted = null;
+        try{
+            if(toConvert != null && toConvert.equals("0")){
+                converted = false;
+            }else if(toConvert != null && toConvert.equals("1")){
+                converted = true;
+            }
+        }catch (Exception e){
+            logger.warn("Invalid data type provided \n");
+            logger.error(e.getMessage());
+        }
+        return converted;
+    }
+
 }
