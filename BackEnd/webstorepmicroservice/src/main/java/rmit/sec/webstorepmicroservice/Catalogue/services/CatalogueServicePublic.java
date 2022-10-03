@@ -78,4 +78,14 @@ public class CatalogueServicePublic {
         return encryptedCatalogueItems;
     }
 
+    // Returns a single item from the catalogue
+    public EncryptedCatalogueItem getItemByID(Long sessionKey, Long itemID) {
+        List<CatalogueItem> itemList = new ArrayList<>();
+
+        // Using an arraylist then returning the first element as we know there is only 1 item
+        // This prevents rewriting 'encryptCatalogueItems' method for a single item
+        itemList.add(catalogueItemRepository.getCatalogueItemByItemID(itemID));
+        return encryptCatalogueItems(sessionKey.toString(), itemList).get(0);
+    }
+
 }
