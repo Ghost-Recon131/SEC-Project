@@ -32,7 +32,7 @@ public class CatalogueControllerPrivate {
 
     // Endpoint to List item
     @PostMapping("/listItem")
-    public String listItem(HttpServletRequest request, @RequestParam Long sessionID, @RequestBody EncryptedCatalogueItem itemRequest) {
+    public String listItem(HttpServletRequest request, @RequestParam Long sessionID, @RequestBody EncryptedEditItemRequest itemRequest) {
         Long sellerID = jwtUtil.getUserIdByJWT(request).getId();
 
         // Decrypt the item request from frontend & convert types as needed
