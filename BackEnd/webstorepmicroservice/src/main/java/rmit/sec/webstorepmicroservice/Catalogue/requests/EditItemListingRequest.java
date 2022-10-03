@@ -1,13 +1,13 @@
 package rmit.sec.webstorepmicroservice.Catalogue.requests;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
 @Getter
 @Setter
-@NoArgsConstructor
+@AllArgsConstructor
 public class EditItemListingRequest {
     private Long itemID;
     private String itemName;
