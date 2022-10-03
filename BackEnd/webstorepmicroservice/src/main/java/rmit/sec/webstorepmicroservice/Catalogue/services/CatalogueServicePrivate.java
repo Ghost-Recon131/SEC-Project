@@ -9,7 +9,10 @@ import rmit.sec.webstorepmicroservice.Catalogue.model.CatalogueItem;
 import rmit.sec.webstorepmicroservice.Catalogue.repository.CatalogueItemRepository;
 import rmit.sec.webstorepmicroservice.Catalogue.requests.EditItemListingRequest;
 import rmit.sec.webstorepmicroservice.Catalogue.requests.ItemListingRequest;
+import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 import rmit.sec.webstorepmicroservice.utils.ItemCatagory;
+
+import java.util.Objects;
 
 
 @Service
@@ -17,11 +20,13 @@ import rmit.sec.webstorepmicroservice.utils.ItemCatagory;
 public class CatalogueServicePrivate {
     @Autowired
     private CatalogueItemRepository catalogueItemRepository;
+    @Autowired
+    private EncryptionUtil encryptionUtil;
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     // List new item
-    public String listItem(Long sellerID, ItemListingRequest request) {
+    public String listItem(Long sellerID, ItemListingRequest request, String sessionKey) {
         String result = "";
         CatalogueItem newItem = null;
         try{
@@ -46,53 +51,61 @@ public class CatalogueServicePrivate {
             logger.warn("Error listing new item");
             logger.error(e.getMessage());
         }
-        return result;
+        return encryptionUtil.serverAESEncrypt(sessionKey, result);
     }
 
     // Allow user to edit item fields
-    public String editItem(EditItemListingRequest request) {
+    public String editItem(Long sellerID, EditItemListingRequest request, String sessionKey) {
         String result = "";
         CatalogueItem toEdit = null;
+        boolean continueProcess = false;
         try{
             toEdit = catalogueItemRepository.getCatalogueItemByItemID(request.getItemID());
+            continueProcess = true;
         }catch (Exception e){
             result = "Failed to edit item listing";
             logger.error(e.getMessage());
         }
 
-        // Only update fields the user changed
-        try{
-            if(!request.getItemName().isEmpty()){
-                toEdit.setItemName(request.getItemName());
+        // Verify the request to edit comes from the owner of a listing
+        if(continueProcess && Objects.equals(toEdit.getSellerID(), sellerID)){
+            // Only update fields the user changed
+            try{
+                if(!request.getItemName().isEmpty()){
+                    toEdit.setItemName(request.getItemName());
+                }
+                if(!request.getItemDescription().isEmpty()){
+                    toEdit.setItemDescription(request.getItemDescription());
+                }
+                if(request.getItemPrice() != null && request.getItemPrice() > 0){
+                    toEdit.setItemPrice(request.getItemPrice());
+                }
+                if(request.getItemQuantity() != null && request.getItemQuantity() >= 0){
+                    toEdit.setItemQuantity(request.getItemQuantity());
+                }
+                if(request.getItemCategory() != null){
+                    toEdit.setItemCategory(ItemCatagory.valueOf(request.getItemCategory().toUpperCase()));
+                }
+                if(request.getItemImage() != null){
+                    toEdit.setItemImage(request.getItemImage());
+                }
+                if(request.getItemAvailable() != null){
+                    toEdit.setItemAvailable(request.getItemAvailable());
+                }
+                if(toEdit.getItemQuantity() == 0){
+                    toEdit.setItemAvailable(Boolean.FALSE);
+                }
+                catalogueItemRepository.save(toEdit);
+                result = "Successfully edited item listing";
+            }catch (Exception e){
+                result = "Failed to edit item listing";
+                logger.error(e.getMessage());
             }
-            if(!request.getItemDescription().isEmpty()){
-                toEdit.setItemDescription(request.getItemDescription());
-            }
-            if(request.getItemPrice() != null && request.getItemPrice() > 0){
-                toEdit.setItemPrice(request.getItemPrice());
-            }
-            if(request.getItemQuantity() != null && request.getItemQuantity() >= 0){
-                toEdit.setItemQuantity(request.getItemQuantity());
-            }
-            if(request.getItemCategory() != null){
-                toEdit.setItemCategory(ItemCatagory.valueOf(request.getItemCategory().toUpperCase()));
-            }
-            if(request.getItemImage() != null){
-                toEdit.setItemImage(request.getItemImage());
-            }
-            if(request.getItemAvailable() != null){
-                toEdit.setItemAvailable(request.getItemAvailable());
-            }
-            if(toEdit.getItemQuantity() == 0){
-                toEdit.setItemAvailable(Boolean.FALSE);
-            }
-            catalogueItemRepository.save(toEdit);
-            result = "Successfully edited item listing";
-        }catch (Exception e){
-            result = "Failed to edit item listing";
-            logger.error(e.getMessage());
+        }else if(continueProcess && !Objects.equals(toEdit.getSellerID(), sellerID)){
+            result = "You do not own this item";
+            logger.warn("Potential attack detected: Request to edit item user do not own");
         }
-        return result;
+        return encryptionUtil.serverAESEncrypt(sessionKey, result);
     }
 
     // Purchase item (note this only reduces the quantity of the item, it does not handle payment)
@@ -117,19 +130,35 @@ public class CatalogueServicePrivate {
     }
 
     // Allow user to disable their item listing
-    public String disableItem(Long itemID) {
+    public String disableItem(Long sellerID, Long itemID, String sessionKey) {
         String result = "";
         CatalogueItem toDisable = null;
+        boolean continueProcess = false;
+
+        // Get the item from DB
         try{
             toDisable = catalogueItemRepository.getCatalogueItemByItemID(itemID);
-            toDisable.setItemAvailable(Boolean.FALSE);
-            catalogueItemRepository.save(toDisable);
-            result = "Successfully disabled item listing";
+            continueProcess = true;
         }catch (Exception e){
             result = "Failed to disable item listing";
             logger.error(e.getMessage());
         }
-        return result;
+
+        // Verify the request is made by the owner of the item
+        if(continueProcess && Objects.equals(toDisable.getSellerID(), sellerID)){
+            try{
+                toDisable.setItemAvailable(Boolean.FALSE);
+                catalogueItemRepository.save(toDisable);
+                result = "Successfully disabled item listing";
+            }catch (Exception e){
+                result = "Failed to disable item listing";
+                logger.error(e.getMessage());
+            }
+        }else if(continueProcess && !Objects.equals(toDisable.getSellerID(), sellerID)){
+            result = "You do not own this item";
+            logger.warn("Potential attack detected: Request to edit item user do not own");
+        }
+        return encryptionUtil.serverAESEncrypt(sessionKey, result);
     }
 
 }
