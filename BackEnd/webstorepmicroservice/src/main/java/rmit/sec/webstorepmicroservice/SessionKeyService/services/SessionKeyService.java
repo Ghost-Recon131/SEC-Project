@@ -50,8 +50,8 @@ public class SessionKeyService {
         return sessionID;
     }
 
-    // Decrypt a message encrypted with the server's RSA public key
-    public String aesDecryptMessage(Long sessionID, String encryptedMessage) {
+    // Get the AES encryption key
+    public String getAESKey(Long sessionID){
         String aesSessionKey = null;
         try{
             SessionKey sessionKeyObject = sessionKeyRepository.getBySessionID(sessionID);
@@ -60,19 +60,18 @@ public class SessionKeyService {
             logger.error(e.getMessage());
             logger.warn("Possible failed to retrieve encryption key from DB");
         }
+        return aesSessionKey;
+    }
+
+    // Decrypt a message encrypted with the server's RSA public key
+    public String aesDecryptMessage(Long sessionID, String encryptedMessage) {
+        String aesSessionKey = getAESKey(sessionID);
         return encryptionUtil.serverAESDecrypt(aesSessionKey, encryptedMessage);
     }
 
     // TEST METHOD
     public String aesEncryptMessage(Long sessionID, String plainText){
-        String aesSessionKey = null;
-        try{
-            SessionKey sessionKeyObject = sessionKeyRepository.getBySessionID(sessionID);
-            aesSessionKey = encryptionUtil.serverRSADecrypt(sessionKeyObject.getSessionKey());
-        }catch (Exception e){
-            logger.error(e.getMessage());
-            logger.warn("Possible failed to retrieve encryption key from DB");
-        }
+        String aesSessionKey = getAESKey(sessionID);
         return encryptionUtil.serverAESEncrypt(aesSessionKey, plainText);
     }
 
