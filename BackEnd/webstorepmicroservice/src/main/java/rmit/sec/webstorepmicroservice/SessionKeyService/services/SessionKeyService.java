@@ -11,6 +11,8 @@ import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 
 import java.util.Random;
 
+import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLIC;
+
 @Service
 @AllArgsConstructor
 public class SessionKeyService {
@@ -61,6 +63,15 @@ public class SessionKeyService {
             logger.warn("Possible failed to retrieve encryption key from DB");
         }
         return aesSessionKey;
+    }
+
+    // Get the server's RSA public key
+    public String getServerPublicKey(){
+        StringBuilder publicKey = new StringBuilder();
+        publicKey.append("-----BEGIN PUBLIC KEY-----");
+        publicKey.append(RSA_PUBLIC);
+        publicKey.append("-----END PUBLIC KEY-----");
+        return publicKey.toString();
     }
 
     // Decrypt a message encrypted with the server's RSA public key

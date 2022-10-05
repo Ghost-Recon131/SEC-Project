@@ -2,6 +2,12 @@
 
 Current Domain is localhost: http://localhost:8080/
 # Session Key Service
+## Get server RSA public key
+* Request Method: GET
+* Endpoint URI: /api/sessionKeyService/getServerPublicKey
+* Returns the key as a string value
+
+
 ## Initial Key Exchange
 * Request Method: POST
 * Endpoint URI: /api/sessionKeyService/keyExchange

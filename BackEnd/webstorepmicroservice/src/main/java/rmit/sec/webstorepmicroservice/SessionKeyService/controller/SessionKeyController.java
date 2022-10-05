@@ -19,6 +19,12 @@ public class SessionKeyController {
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
+    // Endpoint to retrieve server's public RSA key
+    @GetMapping(path = "/getServerPublicKey")
+    public String getServerPublicKey() {
+        return sessionKeyService.getServerPublicKey();
+    }
+
     // Endpoint to initiate the key exchange from client
     @PostMapping(path = "/keyExchange")
     public Long keyExchange(@RequestBody EncryptedDataRequest encryptedDataRequest){

@@ -72,7 +72,7 @@ public class EncryptionUtil {
         return publicKey;
     }
 
-    // Calculates the actual encryption key used for AES encryption
+    // Calculates the actual RSA private key using the provided secret
      private PrivateKey getPrivateKey(String privateKeyString){
         PrivateKey privateKey = null;
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString.getBytes()));
