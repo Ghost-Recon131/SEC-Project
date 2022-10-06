@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -26,5 +27,14 @@ public class Transactions {
 
     @Column(name = "total_cost")
     private Double totalCost;
+
+    @Column(name = "create_At")
+    private Date create_At = new Date();
+
+    public Transactions(Long sellerID, Long buyerID, Double totalCost) {
+        this.sellerID = sellerID;
+        this.buyerID = buyerID;
+        this.totalCost = totalCost;
+    }
 
 }
