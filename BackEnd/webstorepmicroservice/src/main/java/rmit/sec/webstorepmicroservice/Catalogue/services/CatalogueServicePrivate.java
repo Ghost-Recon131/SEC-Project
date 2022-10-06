@@ -9,6 +9,7 @@ import rmit.sec.webstorepmicroservice.Catalogue.model.CatalogueItem;
 import rmit.sec.webstorepmicroservice.Catalogue.repository.CatalogueItemRepository;
 import rmit.sec.webstorepmicroservice.Catalogue.requests.EditItemListingRequest;
 import rmit.sec.webstorepmicroservice.Catalogue.requests.ItemListingRequest;
+import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyService;
 import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 import rmit.sec.webstorepmicroservice.utils.ItemCatagory;
 
@@ -21,12 +22,11 @@ public class CatalogueServicePrivate {
     @Autowired
     private CatalogueItemRepository catalogueItemRepository;
     @Autowired
-    private EncryptionUtil encryptionUtil;
-
+    private SessionKeyService sessionKeyService;
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     // List new item
-    public String listItem(Long sellerID, ItemListingRequest request, String sessionKey) {
+    public String listItem(Long sellerID, ItemListingRequest request, Long sessionID) {
         String result = "";
         CatalogueItem newItem = null;
         try{
@@ -51,11 +51,11 @@ public class CatalogueServicePrivate {
             logger.warn("Error listing new item");
             logger.error(e.getMessage());
         }
-        return encryptionUtil.serverAESEncrypt(sessionKey, result);
+        return sessionKeyService.aesEncryptMessage(sessionID, result);
     }
 
     // Allow user to edit item fields
-    public String editItem(Long sellerID, EditItemListingRequest request, String sessionKey) {
+    public String editItem(Long sellerID, EditItemListingRequest request, Long sessionID) {
         String result = "";
         CatalogueItem toEdit = null;
         boolean continueProcess = false;
@@ -105,7 +105,7 @@ public class CatalogueServicePrivate {
             result = "You do not own this item";
             logger.warn("Potential attack detected: Request to edit item user do not own");
         }
-        return encryptionUtil.serverAESEncrypt(sessionKey, result);
+        return sessionKeyService.aesEncryptMessage(sessionID, result);
     }
 
     // Purchase item (note this only reduces the quantity of the item, it does not handle payment)
@@ -130,7 +130,7 @@ public class CatalogueServicePrivate {
     }
 
     // Allow user to disable their item listing
-    public String disableItem(Long sellerID, Long itemID, String sessionKey) {
+    public String disableItem(Long sellerID, Long itemID, Long sessionID) {
         String result = "";
         CatalogueItem toDisable = null;
         boolean continueProcess = false;
@@ -158,7 +158,7 @@ public class CatalogueServicePrivate {
             result = "You do not own this item";
             logger.warn("Potential attack detected: Request to edit item user do not own");
         }
-        return encryptionUtil.serverAESEncrypt(sessionKey, result);
+        return sessionKeyService.aesEncryptMessage(sessionID, result);
     }
 
 }

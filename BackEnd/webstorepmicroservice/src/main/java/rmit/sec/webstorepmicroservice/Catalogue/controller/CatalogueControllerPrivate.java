@@ -48,7 +48,7 @@ public class CatalogueControllerPrivate {
                 sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemImage()),
                 sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemCategory())
         );
-        return catalogueServicePrivate.listItem(sellerID, decryptedItemRequest, sessionKeyService.getAESKey(sessionID));
+        return catalogueServicePrivate.listItem(sellerID, decryptedItemRequest, sessionID);
     }
 
     // Endpoint to edit a listing the user owns
@@ -77,7 +77,7 @@ public class CatalogueControllerPrivate {
                     sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemImage()),
                     sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemCategory())
             );
-            result = catalogueServicePrivate.editItem(sellerID, decryptedRequest, sessionKeyService.getAESKey(sessionID));
+            result = catalogueServicePrivate.editItem(sellerID, decryptedRequest, sessionID);
         }else{
             result = "Failed to convert itemAvailable";
         }
@@ -89,7 +89,7 @@ public class CatalogueControllerPrivate {
     public String endListing(HttpServletRequest request, @RequestParam Long sessionID, @RequestBody EncryptedItemViewRequest editRequest) {
         Long sellerID = jwtUtil.getUserIdByJWT(request).getId();
         Long itemID =  typeConvertUtil.convertToLong(sessionKeyService.aesDecryptMessage(sessionID, editRequest.getItemID()));
-        return catalogueServicePrivate.disableItem(sellerID, itemID, sessionKeyService.getAESKey(sessionID));
+        return catalogueServicePrivate.disableItem(sellerID, itemID, sessionID);
     }
 
 }
