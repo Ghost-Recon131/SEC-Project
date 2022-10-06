@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class EncryptedViewTransactionRequest {
-    private String TransactionID;
+    private String transactionID;
     private String sellerID;
     private String buyerID;
 }

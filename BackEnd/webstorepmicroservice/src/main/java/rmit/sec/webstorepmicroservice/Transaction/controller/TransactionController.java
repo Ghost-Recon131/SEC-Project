@@ -41,14 +41,14 @@ public class TransactionController {
     }
 
     // Endpoint to get list of purchases for the user
-    @GetMapping("/getAllPurchasesByUserID")
+    @GetMapping("/getAllPurchases")
     public List<EncryptedTransaction> getAllPurchasesByUserID(HttpServletRequest request, @RequestParam Long sessionID){
         Long userID = jwtUtil.getUserIdByJWT(request).getId();
         return transactionService.getAllPurchasesByUserID(sessionID, userID);
     }
 
     // Endpoint to get list of sales for the user
-    @GetMapping("/getAllSalesByUserID")
+    @GetMapping("/getAllSales")
     public List<EncryptedTransaction> getAllSalesByUserID(HttpServletRequest request, @RequestParam Long sessionID){
         Long userID = jwtUtil.getUserIdByJWT(request).getId();
         return transactionService.getAllSalesByUserID(sessionID, userID);
