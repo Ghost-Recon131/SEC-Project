@@ -11,18 +11,17 @@ import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 
 import java.util.Random;
 
+import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLIC;
+
 @Service
 @AllArgsConstructor
 public class SessionKeyService {
-//    private SecureRandom secureRandom;
+
     @Autowired
     private EncryptionUtil encryptionUtil;
     @Autowired
     private SessionKeyRepository sessionKeyRepository;
     private final Logger logger = LogManager.getLogger(this.getClass());
-
-    // Temporary key for testing purposes
-    private final String tmpkey = "u/Gu5posvwDsXUnV5Zaq4g==";
 
     // Handles the key exchange process
     public Long keyExchange(String encryptedKey){
@@ -35,7 +34,9 @@ public class SessionKeyService {
 
         // Store new session in database if decryption is successful
         if(decryptedKey != null && !decryptedKey.isEmpty()){
-            SessionKey sessionKey = new SessionKey(decryptedKey, tmpSessionID);
+            String securedSessionKey = encryptionUtil.serverRSAEncrypt(decryptedKey);
+
+            SessionKey sessionKey = new SessionKey(securedSessionKey, tmpSessionID);
             sessionKeyRepository.save(sessionKey);
 
             // Retrieve the sessionID from DB and return it to client
@@ -51,20 +52,46 @@ public class SessionKeyService {
         return sessionID;
     }
 
-    // Decrypt a message encrypted with the server's RSA public key
+    // Get the AES encryption key
+    public String getAESKey(Long sessionID){
+        String aesSessionKey = null;
+        try{
+            SessionKey sessionKeyObject = sessionKeyRepository.getBySessionID(sessionID);
+            aesSessionKey = encryptionUtil.serverRSADecrypt(sessionKeyObject.getSessionKey());
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            logger.warn("Possible failed to retrieve encryption key from DB");
+        }
+        return aesSessionKey;
+    }
+
+    // Get the server's RSA public key
+    public String getServerPublicKey(){
+        StringBuilder publicKey = new StringBuilder();
+        publicKey.append("-----BEGIN PUBLIC KEY-----");
+        publicKey.append(RSA_PUBLIC);
+        publicKey.append("-----END PUBLIC KEY-----");
+        return publicKey.toString();
+    }
+
+    // Performs AES decryption for data for a session ID
     public String aesDecryptMessage(Long sessionID, String encryptedMessage) {
-        return encryptionUtil.serverAESDecrypt(tmpkey, encryptedMessage);
+        String aesSessionKey = getAESKey(sessionID);
+        return encryptionUtil.serverAESDecrypt(aesSessionKey, encryptedMessage);
     }
 
-    // TEST METHOD
+    // Performs AES encryption for data for a session ID
     public String aesEncryptMessage(Long sessionID, String plainText){
-        return encryptionUtil.serverAESEncrypt(tmpkey, plainText);
+        String aesSessionKey = getAESKey(sessionID);
+        return encryptionUtil.serverAESEncrypt(aesSessionKey, plainText);
     }
 
+    // Performs RSA encryption using the server's public key
     public String rsaEncryptMessage(String plainText){
         return encryptionUtil.serverRSAEncrypt(plainText);
     }
 
+    // Performs RSA encryption using the server's private key
     public String rsaDecryptMessage(String plainText){
         return encryptionUtil.serverRSADecrypt(plainText);
     }

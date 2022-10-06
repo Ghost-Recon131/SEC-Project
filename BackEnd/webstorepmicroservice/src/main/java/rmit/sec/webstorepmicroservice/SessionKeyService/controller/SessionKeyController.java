@@ -14,11 +14,16 @@ import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyServi
 @RequestMapping("/api/sessionKeyService")
 @AllArgsConstructor
 public class SessionKeyController {
-    // TODO
     @Autowired
     private SessionKeyService sessionKeyService;
 
     private final Logger logger = LogManager.getLogger(this.getClass());
+
+    // Endpoint to retrieve server's public RSA key
+    @GetMapping(path = "/getServerPublicKey")
+    public String getServerPublicKey() {
+        return sessionKeyService.getServerPublicKey();
+    }
 
     // Endpoint to initiate the key exchange from client
     @PostMapping(path = "/keyExchange")
