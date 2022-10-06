@@ -457,5 +457,16 @@
         </div>
 
     </footer>
+    <script>
+        function myFunction() {
+            fetch('http://localhost:8080/api/sessionKeyService/getServerPublicKey' , {
+        method: 'GET'
+       
+    })
+}
+window.onload = myFunction;
+
+console.log(myFunction)
+    </script>
     </body>
 </html>
