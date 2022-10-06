@@ -760,14 +760,10 @@ footer .copyright {
 #reg-form .login-para{
     text-align: center;
     font-size: 15px;
-    margin-top: 70px;
+    margin-top: 160px;
 }
 
-#reg-form .login-para{
-    text-align: center;
-    font-size: 15px;
-    margin-top: 70px;
-}
+
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 *{

@@ -38,31 +38,36 @@
 
     <h1>Sign Up</h1>
     <h4>It's free and only takes a minute</h4>
-    <form class="form">
-        <label>First Name</label>
-        <input type="text" placeholder="" id="firstname" name="firstname">
-
-        <label>Last Name</label>
-        <input type="text" placeholder="" id="lastname" name="lastname">
-
+    <form class="form" id="form"  >
         <label>Username</label>
-        <input type="text" placeholder="" id="username" name="username">
+        <input type="text" placeholder="Enter Username" id="username" name="username" required="required" >
 
         <label>E-mail</label>
-        <input type="text" placeholder="" id="email" name="email">
+        <input type="text" placeholder="Enter E-mail" id="email" name="email" required="required" >
+
+        <label>First Name</label>
+        <input type="text" placeholder="Enter First Name" id="firstname" name="firstname" required="required" >
+
+        <label>Last Name</label>
+        <input type="text" placeholder="Enter Last Name" id="lastname" name="lastname" required="required" >
 
         <label>Password</label>
-        <input type="password" placeholder="" id="password" name="password">
+        <input type="password" placeholder="Enter Password" id="password" name="password" required="required" >
 
         <label>Confirm Password</label>
-        <input type="password" placeholder="" id="passwordconfirm">
+        <input type="password" placeholder="Confirm Password" id="confirmPassword" required="required" >
 
+        <label>Secret Question</label>
+        <input type="text" placeholder="Enter Secret Question" id="secret_question" name="secret_question" required="required" >
+
+        <label>Secret Question Answer</label>
+        <input type="text" placeholder="Enter Secret Answer" id="secret_question_answer" name="secret_question_answer" required="required" >
 
         <input type="submit" value="Submit" id="submit">
 
 
     </form>
-        <p>By Clicking the Sign Up button,you agree to our <br>
+        <p class="terms">By Clicking the Sign Up button,you agree to our <br>
          <a href="#">Terms and Conditions</a> and <a href="#">Policy Privacy</a>
 
         </p>
@@ -126,25 +131,18 @@
     </div>
 
       <script>
+const form = document.getElementById('form');
 
-const formE1 = document.querySelector('.form')
-formE1.addEventListener('submit', event =>{
+form.addEventListener('submit', callbackFunction);
+                      
+function callbackFunction(event) {
     event.preventDefault();
+    const myFormData = new FormData(event.target);
 
-    const formDate = new FormData(formE1);
-
-    const data = Object.fromEntries(formDate);
-
-    fetch('https://reqres.in/api/users',{
-        method: 'POST',
-        headers:{
-            // 'Authentication: jwt token'
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-
-    })
-})
+    const formDataObj = {};
+    myFormData.forEach((value, key) => (formDataObj[key] = value));
+    console.log(formDataObj);
+};
 
 
     </script>
