@@ -12,7 +12,7 @@ import rmit.sec.webstorepmicroservice.utils.TypeConvertUtil;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/catalogue")
 @AllArgsConstructor
 public class CatalogueControllerPublic {

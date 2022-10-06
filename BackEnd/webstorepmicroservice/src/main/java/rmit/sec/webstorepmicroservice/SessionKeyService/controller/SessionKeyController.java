@@ -10,7 +10,7 @@ import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyServi
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/sessionKeyService")
 @AllArgsConstructor
 public class SessionKeyController {

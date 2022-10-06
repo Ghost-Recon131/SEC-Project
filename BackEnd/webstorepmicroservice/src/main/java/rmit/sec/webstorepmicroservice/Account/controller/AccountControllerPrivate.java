@@ -14,7 +14,7 @@ import rmit.sec.webstorepmicroservice.utils.JWTUtil;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/authorised")
 @AllArgsConstructor
 public class AccountControllerPrivate {

@@ -16,7 +16,7 @@ import rmit.sec.webstorepmicroservice.utils.TypeConvertUtil;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/authorised/catalogue")
 @AllArgsConstructor
 public class CatalogueControllerPrivate {

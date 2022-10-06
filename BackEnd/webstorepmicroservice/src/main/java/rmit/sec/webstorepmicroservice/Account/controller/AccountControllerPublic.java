@@ -23,7 +23,7 @@ import javax.persistence.Access;
 import static rmit.sec.webstorepmicroservice.security.SecurityConstant.TOKEN_PREFIX;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/RegisterLogin")
 @AllArgsConstructor
 public class AccountControllerPublic {
