@@ -9,4 +9,7 @@ public interface SessionKeyRepository extends JpaRepository<SessionKey, Long> {
     SessionKey getBySessionID(Long id);
 
     SessionKey getSessionKeyByTmpSessionID(Integer tmp);
+
+    // Delete a key once it has expired
+    void deleteBySessionID(Long id);
 }

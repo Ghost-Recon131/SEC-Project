@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -30,11 +30,11 @@ public class SessionKey {
 
     // Date created
     @Column(name = "creation_date")
-    private LocalDate creationDate = LocalDate.now();
+    private LocalDateTime creationDate = LocalDateTime.now();
 
     // Expiry date, set to 1 day from creation
     @Column(name = "expiry_date")
-    private LocalDate expiryDate = creationDate.plusDays(1);
+    private LocalDateTime expiryDate = creationDate.plusHours(24);
 
     // Constructor
     public SessionKey(String sessionKey, Integer tmpSessionID) {

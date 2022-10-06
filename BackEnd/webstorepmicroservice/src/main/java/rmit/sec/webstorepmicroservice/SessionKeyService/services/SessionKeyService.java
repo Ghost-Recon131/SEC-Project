@@ -9,6 +9,7 @@ import rmit.sec.webstorepmicroservice.SessionKeyService.model.SessionKey;
 import rmit.sec.webstorepmicroservice.SessionKeyService.repository.SessionKeyRepository;
 import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 
 import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLIC;
@@ -57,7 +58,15 @@ public class SessionKeyService {
         String aesSessionKey = null;
         try{
             SessionKey sessionKeyObject = sessionKeyRepository.getBySessionID(sessionID);
-            aesSessionKey = encryptionUtil.serverRSADecrypt(sessionKeyObject.getSessionKey());
+
+            // Check key is still valid
+            LocalDateTime currentDate = LocalDateTime.now();
+            if(sessionKeyObject.getExpiryDate().isBefore(currentDate)){
+                aesSessionKey = encryptionUtil.serverRSADecrypt(sessionKeyObject.getSessionKey());
+            }else{
+                logger.debug("Session key has expired");
+                deleteExpiredKeys();
+            }
         }catch (Exception e){
             logger.error(e.getMessage());
             logger.warn("Possible failed to retrieve encryption key from DB");
@@ -96,6 +105,14 @@ public class SessionKeyService {
         return encryptionUtil.serverRSADecrypt(plainText);
     }
 
-
+    // Check DB for expired keys and then delete them
+    private void deleteExpiredKeys(){
+        LocalDateTime currentDate = LocalDateTime.now();
+        sessionKeyRepository.findAll().forEach(sessionKey -> {
+            if(sessionKey.getExpiryDate().isBefore(currentDate)){
+                sessionKeyRepository.deleteBySessionID(sessionKey.getSessionID());
+            }
+        });
+    }
 
 }
