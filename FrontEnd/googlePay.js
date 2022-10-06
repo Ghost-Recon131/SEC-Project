@@ -26,7 +26,7 @@ const googlePayConfiguration = {
 let googlePayClient;
 
 function onGooglePayLoaded(){
-    googlePayClient = new googlePayClient.payment.api.PaymentsClient({
+    googlePayClient = new google.payments.api.PaymentsClient({
         enviroment: "TEST",
     });
 
@@ -61,7 +61,7 @@ function onGooglePaymentButtonClicked() {
 
     paymentDataRequest.transactionInfo = {
         totalPriceStatus: 'FINAL',
-        totalPrice: selectedItem.price,
+        totalPrice: 100,
         currencyCode: 'AUD',
         countryCode: 'AU',
     };
@@ -71,13 +71,3 @@ function onGooglePaymentButtonClicked() {
         .catch(error => console.error('loadPaymentData error: ', error));
 }
 
-function processPaymentData(paymentData) {
-    fetch(ordersEndPointUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-
-        body: paymentData
-    })
-}
