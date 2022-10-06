@@ -74,13 +74,13 @@ public class SessionKeyService {
         return publicKey.toString();
     }
 
-    // Decrypt a message encrypted with the server's RSA public key
+    // Performs AES decryption for data for a session ID
     public String aesDecryptMessage(Long sessionID, String encryptedMessage) {
         String aesSessionKey = getAESKey(sessionID);
         return encryptionUtil.serverAESDecrypt(aesSessionKey, encryptedMessage);
     }
 
-    // TEST METHOD
+    // Performs AES encryption for data for a session ID
     public String aesEncryptMessage(Long sessionID, String plainText){
         String aesSessionKey = getAESKey(sessionID);
         return encryptionUtil.serverAESEncrypt(aesSessionKey, plainText);
