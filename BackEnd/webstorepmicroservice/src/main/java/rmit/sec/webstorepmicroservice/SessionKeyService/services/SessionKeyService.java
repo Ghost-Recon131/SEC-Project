@@ -61,11 +61,12 @@ public class SessionKeyService {
 
             // Check key is still valid
             LocalDateTime currentDate = LocalDateTime.now();
-            if(sessionKeyObject.getExpiryDate().isBefore(currentDate)){
+            if(currentDate.isAfter(sessionKeyObject.getExpiryDate())){
                 aesSessionKey = encryptionUtil.serverRSADecrypt(sessionKeyObject.getSessionKey());
             }else{
                 logger.debug("Session key has expired");
                 deleteExpiredKeys();
+                aesSessionKey = "EXPIRED";
             }
         }catch (Exception e){
             logger.error(e.getMessage());
@@ -109,7 +110,7 @@ public class SessionKeyService {
     private void deleteExpiredKeys(){
         LocalDateTime currentDate = LocalDateTime.now();
         sessionKeyRepository.findAll().forEach(sessionKey -> {
-            if(sessionKey.getExpiryDate().isBefore(currentDate)){
+            if(currentDate.isAfter(sessionKey.getExpiryDate())){
                 sessionKeyRepository.deleteBySessionID(sessionKey.getSessionID());
             }
         });
