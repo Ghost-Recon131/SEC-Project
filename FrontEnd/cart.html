@@ -80,10 +80,17 @@
                 <td><strong>Total</strong></td>
                 <td>$ 335</td>
             </tr>
+            <div>
+                <script src="googlePay.js"></script>
+				<script async src="https://pay.google.com/gp/p/js/pay.js" onload="onGooglePayLoaded()"></script>
+    
+            </div>
         </table>
-        <button class="normal">Proceed to checkout</button>
+
+        <button id="buy-now" name="buy-now"></button>
     </div>
 </section>
+</body>
 
 <footer class="section-p1">
     <div class="col">
@@ -135,10 +142,12 @@
         <img src="tut/img/pay/pay.png" alt="">
     </div>
 
+
+      
+   
     <div class="copyright">
         <p>&copy; 2022, The Boys </p>
     </div>
 
 </footer>
-</body>
 </html>
