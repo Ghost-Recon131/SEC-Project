@@ -17,8 +17,7 @@ import rmit.sec.webstorepmicroservice.Account.services.AccountService;
 import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyService;
 import rmit.sec.webstorepmicroservice.security.JWTLoginSucessReponse;
 import rmit.sec.webstorepmicroservice.security.JwtTokenProvider;
-
-import javax.persistence.Access;
+import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 
 import static rmit.sec.webstorepmicroservice.security.SecurityConstant.TOKEN_PREFIX;
 
@@ -35,20 +34,23 @@ public class AccountControllerPublic {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private SessionKeyService sessionKeyService;
+    @Autowired
+    private EncryptionUtil encryptionUtil;
 
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     // Endpoint for registering an account
     @PostMapping(path = "/register")
     public String registerAccount(@RequestParam Long sessionID, @RequestBody AccountRegisterRequest registerAccountRequest) {
+        String sessionKey = sessionKeyService.getAESKey(sessionID);
         // Decrypt the data
-        registerAccountRequest.setUsername(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getUsername()));
-        registerAccountRequest.setEmail(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getEmail()));
-        registerAccountRequest.setFirstname(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getFirstname()));
-        registerAccountRequest.setLastname(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getLastname()));
-        registerAccountRequest.setPassword(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getPassword()));
-        registerAccountRequest.setSecret_question(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getSecret_question()));
-        registerAccountRequest.setSecret_question_answer(sessionKeyService.aesDecryptMessage(sessionID, registerAccountRequest.getSecret_question_answer()));
+        registerAccountRequest.setUsername(encryptionUtil.serverAESDecrypt(sessionKey, registerAccountRequest.getUsername()));
+        registerAccountRequest.setEmail(encryptionUtil.serverAESDecrypt(sessionKey, registerAccountRequest.getEmail()));
+        registerAccountRequest.setFirstname(encryptionUtil.serverAESDecrypt(sessionKey, registerAccountRequest.getFirstname()));
+        registerAccountRequest.setLastname(encryptionUtil.serverAESDecrypt(sessionKey, registerAccountRequest.getLastname()));
+        registerAccountRequest.setPassword(encryptionUtil.serverAESDecrypt(sessionKey, registerAccountRequest.getPassword()));
+        registerAccountRequest.setSecret_question(encryptionUtil.serverAESDecrypt(sessionKey, registerAccountRequest.getSecret_question()));
+        registerAccountRequest.setSecret_question_answer(encryptionUtil.serverAESDecrypt(sessionKey, registerAccountRequest.getSecret_question_answer()));
 
         // Attempt to register the account then return the result
         String result = accountService.createAccount(registerAccountRequest);
@@ -58,8 +60,9 @@ public class AccountControllerPublic {
     // Endpoint for login. Validate login credentials then return a JWT token if successful
     @PostMapping(path = "/login")
     public ResponseEntity<?> login(@RequestParam Long sessionID, @RequestBody LoginRequest loginRequest){
-        String decryptedUsername = sessionKeyService.aesDecryptMessage(sessionID, loginRequest.getUsername());
-        String decryptedPassword = sessionKeyService.aesDecryptMessage(sessionID, loginRequest.getPassword());
+        String sessionKey = sessionKeyService.getAESKey(sessionID);
+        String decryptedUsername = encryptionUtil.serverAESDecrypt(sessionKey, loginRequest.getUsername());
+        String decryptedPassword = encryptionUtil.serverAESDecrypt(sessionKey, loginRequest.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -77,12 +80,13 @@ public class AccountControllerPublic {
     // Endpoint for resetting a forgotten password
     @PostMapping(path = "/forgotPassword")
     public String forgotPassword(@RequestParam Long sessionID, @RequestBody ForgotPasswordRequest request){
+        String sessionKey = sessionKeyService.getAESKey(sessionID);
         // Decrypt the original request and then create a decrypted request to pass to accountService
         ForgotPasswordRequest decryptedRequest = new ForgotPasswordRequest(
-                sessionKeyService.aesDecryptMessage(sessionID, request.getUsername()),
-                sessionKeyService.aesDecryptMessage(sessionID, request.getSecret_question()),
-                sessionKeyService.aesDecryptMessage(sessionID, request.getSecret_question_answer()),
-                sessionKeyService.aesDecryptMessage(sessionID, request.getNewPassword())
+                encryptionUtil.serverAESDecrypt(sessionKey, request.getUsername()),
+                encryptionUtil.serverAESDecrypt(sessionKey, request.getSecret_question()),
+                encryptionUtil.serverAESDecrypt(sessionKey, request.getSecret_question_answer()),
+                encryptionUtil.serverAESDecrypt(sessionKey, request.getNewPassword())
         );
 
         return accountService.forgotPassword(decryptedRequest);

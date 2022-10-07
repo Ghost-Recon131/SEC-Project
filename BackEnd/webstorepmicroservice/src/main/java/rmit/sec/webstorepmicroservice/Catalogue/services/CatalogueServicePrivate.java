@@ -10,7 +10,6 @@ import rmit.sec.webstorepmicroservice.Catalogue.repository.CatalogueItemReposito
 import rmit.sec.webstorepmicroservice.Catalogue.requests.EditItemListingRequest;
 import rmit.sec.webstorepmicroservice.Catalogue.requests.ItemListingRequest;
 import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyService;
-import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 import rmit.sec.webstorepmicroservice.utils.ItemCatagory;
 
 import java.util.Objects;

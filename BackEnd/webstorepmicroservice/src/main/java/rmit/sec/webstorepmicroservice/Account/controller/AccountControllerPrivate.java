@@ -9,6 +9,7 @@ import rmit.sec.webstorepmicroservice.Account.requests.ChangePasswordRequest;
 import rmit.sec.webstorepmicroservice.Account.requests.UpdateAccountInfoRequest;
 import rmit.sec.webstorepmicroservice.Account.services.AccountServiceAuthorised;
 import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyService;
+import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 import rmit.sec.webstorepmicroservice.utils.JWTUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +25,8 @@ public class AccountControllerPrivate {
     private JWTUtil jwtUtil;
     @Autowired
     private SessionKeyService sessionKeyService;
+    @Autowired
+    private EncryptionUtil encryptionUtil;
 
     // Endpoint to view account's information, requires valid JWT token
     @GetMapping(path = "/viewAccountInfo")
@@ -31,15 +34,15 @@ public class AccountControllerPrivate {
         // Get the user account details
         Account userAccount = accountServiceAuthorised.getAccountInfo(request);
 
-        // Pick details to return to frontend & then encrypt the output
+        // Getting our AES key then encrypt and return data to frontend
+        String sessionKey = sessionKeyService.getAESKey(sessionID);
         JSONObject encryptedResponse = new JSONObject();
-        encryptedResponse.put("id", sessionKeyService.aesEncryptMessage(sessionID, userAccount.getId().toString()));
-        encryptedResponse.put("username", sessionKeyService.aesEncryptMessage(sessionID, userAccount.getUsername()));
-        encryptedResponse.put("email", sessionKeyService.aesEncryptMessage(sessionID, userAccount.getEmail()));
-        encryptedResponse.put("firstname", sessionKeyService.aesEncryptMessage(sessionID, userAccount.getFirstname()));
-        encryptedResponse.put("lastname", sessionKeyService.aesEncryptMessage(sessionID, userAccount.getLastname()));
-        encryptedResponse.put("secretQuestion", sessionKeyService.aesEncryptMessage(sessionID, userAccount.getSecretQuestion()));
-
+        encryptedResponse.put("id", encryptionUtil.serverAESEncrypt(sessionKey, userAccount.getId().toString()));
+        encryptedResponse.put("username", encryptionUtil.serverAESEncrypt(sessionKey, userAccount.getUsername()));
+        encryptedResponse.put("email", encryptionUtil.serverAESEncrypt(sessionKey, userAccount.getEmail()));
+        encryptedResponse.put("firstname", encryptionUtil.serverAESEncrypt(sessionKey, userAccount.getFirstname()));
+        encryptedResponse.put("lastname", encryptionUtil.serverAESEncrypt(sessionKey, userAccount.getLastname()));
+        encryptedResponse.put("secretQuestion", encryptionUtil.serverAESEncrypt(sessionKey, userAccount.getSecretQuestion()));
         return encryptedResponse;
     }
 

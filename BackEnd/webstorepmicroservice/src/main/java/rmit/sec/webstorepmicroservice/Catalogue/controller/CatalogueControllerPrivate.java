@@ -10,6 +10,7 @@ import rmit.sec.webstorepmicroservice.Catalogue.requests.EditItemListingRequest;
 import rmit.sec.webstorepmicroservice.Catalogue.requests.ItemListingRequest;
 import rmit.sec.webstorepmicroservice.Catalogue.services.CatalogueServicePrivate;
 import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyService;
+import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 import rmit.sec.webstorepmicroservice.utils.JWTUtil;
 import rmit.sec.webstorepmicroservice.utils.TypeConvertUtil;
 
@@ -29,6 +30,8 @@ public class CatalogueControllerPrivate {
     private JWTUtil jwtUtil;
     @Autowired
     private TypeConvertUtil typeConvertUtil;
+    @Autowired
+    private EncryptionUtil encryptionUtil;
 
     // Endpoint to List item
     @PostMapping("/listItem")
@@ -36,17 +39,18 @@ public class CatalogueControllerPrivate {
         Long sellerID = jwtUtil.getUserIdByJWT(request).getId();
 
         // Decrypt the item request from frontend & convert types as needed
-        Double itemPrice = typeConvertUtil.convertToDouble(sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemPrice()));
-        Integer itemQuantity = typeConvertUtil.convertToInt(sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemQuantity()));
+        String sessionKey = sessionKeyService.getAESKey(sessionID);
+        Double itemPrice = typeConvertUtil.convertToDouble(encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemPrice()));
+        Integer itemQuantity = typeConvertUtil.convertToInt(encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemQuantity()));
 
         // Pass the decrypted value to 'catalogueServicePrivate' to further process the request
         ItemListingRequest decryptedItemRequest = new ItemListingRequest(
-                sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemName()),
-                sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemDescription()),
+                encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemName()),
+                encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemDescription()),
                 itemPrice,
                 itemQuantity,
-                sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemImage()),
-                sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemCategory())
+                encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemImage()),
+                encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemCategory())
         );
         return catalogueServicePrivate.listItem(sellerID, decryptedItemRequest, sessionID);
     }
@@ -56,26 +60,27 @@ public class CatalogueControllerPrivate {
     public String editItem(HttpServletRequest request, @RequestParam Long sessionID, @RequestBody EncryptedEditItemRequest itemRequest) {
         String result = "";
 
+        String sessionKey = sessionKeyService.getAESKey(sessionID);
         Long sellerID = jwtUtil.getUserIdByJWT(request).getId();
 
         // Decrypt the item request from frontend & convert types as needed
-        Long itemID =  typeConvertUtil.convertToLong(sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemID()));
-        Double itemPrice = typeConvertUtil.convertToDouble(sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemPrice()));
-        Integer itemQuantity = typeConvertUtil.convertToInt(sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemQuantity()));
-        Boolean itemAvailable = typeConvertUtil.convertToBoolean(sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemAvailable()));
+        Long itemID =  typeConvertUtil.convertToLong(encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemID()));
+        Double itemPrice = typeConvertUtil.convertToDouble(encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemPrice()));
+        Integer itemQuantity = typeConvertUtil.convertToInt(encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemQuantity()));
+        Boolean itemAvailable = typeConvertUtil.convertToBoolean(encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemAvailable()));
 
         // Check that item availability is converted properly
         if(itemAvailable != null){
             // Pass the decrypted value to 'catalogueServicePrivate' to further process the request
             EditItemListingRequest decryptedRequest = new EditItemListingRequest(
                     itemID,
-                    sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemName()),
-                    sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemDescription()),
+                    encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemName()),
+                    encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemDescription()),
                     itemAvailable,
                     itemPrice,
                     itemQuantity,
-                    sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemImage()),
-                    sessionKeyService.aesDecryptMessage(sessionID, itemRequest.getItemCategory())
+                    encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemImage()),
+                    encryptionUtil.serverAESDecrypt(sessionKey, itemRequest.getItemCategory())
             );
             result = catalogueServicePrivate.editItem(sellerID, decryptedRequest, sessionID);
         }else{

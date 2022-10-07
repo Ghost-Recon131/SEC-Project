@@ -10,6 +10,7 @@ import rmit.sec.webstorepmicroservice.Transaction.CustomObjects.EncryptedTransac
 import rmit.sec.webstorepmicroservice.Transaction.CustomObjects.EncryptedViewTransactionRequest;
 import rmit.sec.webstorepmicroservice.Transaction.requests.TransactionRequest;
 import rmit.sec.webstorepmicroservice.Transaction.services.TransactionService;
+import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 import rmit.sec.webstorepmicroservice.utils.JWTUtil;
 import rmit.sec.webstorepmicroservice.utils.TypeConvertUtil;
 
@@ -26,6 +27,8 @@ public class TransactionController {
     private TransactionService transactionService;
     @Autowired
     private SessionKeyService sessionKeyService;
+    @Autowired
+    private EncryptionUtil encryptionUtil;
     @Autowired
     private TypeConvertUtil typeConvertUtil;
     @Autowired
@@ -59,9 +62,10 @@ public class TransactionController {
     public String saveTransaction(HttpServletRequest request, @RequestParam Long sessionID, @RequestBody EncryptedTransaction transaction){
         String result = "";
         try{
-            Long buyerID = typeConvertUtil.convertToLong(sessionKeyService.aesDecryptMessage(sessionID, transaction.getBuyerID()));
-            Long sellerID = typeConvertUtil.convertToLong(sessionKeyService.aesDecryptMessage(sessionID, transaction.getSellerID()));
-            Double totalCost = typeConvertUtil.convertToDouble(sessionKeyService.aesDecryptMessage(sessionID, transaction.getTotalCost()));
+            String sessionKey = sessionKeyService.getAESKey(sessionID);
+            Long buyerID = typeConvertUtil.convertToLong(encryptionUtil.serverAESDecrypt(sessionKey, transaction.getBuyerID()));
+            Long sellerID = typeConvertUtil.convertToLong(encryptionUtil.serverAESDecrypt(sessionKey, transaction.getSellerID()));
+            Double totalCost = typeConvertUtil.convertToDouble(encryptionUtil.serverAESDecrypt(sessionKey, transaction.getTotalCost()));
 
             TransactionRequest transactionRequest = new TransactionRequest(buyerID, sellerID, totalCost);
             result = transactionService.saveTransaction(transactionRequest);

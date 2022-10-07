@@ -10,6 +10,7 @@ import rmit.sec.webstorepmicroservice.Transaction.CustomObjects.EncryptedTransac
 import rmit.sec.webstorepmicroservice.Transaction.model.Transactions;
 import rmit.sec.webstorepmicroservice.Transaction.repository.TransactionRepository;
 import rmit.sec.webstorepmicroservice.Transaction.requests.TransactionRequest;
+import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,8 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
     @Autowired
     private SessionKeyService sessionKeyService;
+    @Autowired
+    private EncryptionUtil encryptionUtil;
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     // Get a single transaction
@@ -68,13 +71,14 @@ public class TransactionService {
     private List<EncryptedTransaction> getEncryptedTransaction(Long sessionID, List<Transactions> transactionsList){
         List<EncryptedTransaction> encryptedTransactions = new ArrayList<>();
         try{
+            String sessionKey = sessionKeyService.getAESKey(sessionID);
             // Encrypt the original transactions objects and add to new arraylist
             for (Transactions transaction : transactionsList) {
                 EncryptedTransaction encryptedTransaction = new EncryptedTransaction(
-                        sessionKeyService.aesDecryptMessage(sessionID, transaction.getTransactionID().toString()),
-                        sessionKeyService.aesDecryptMessage(sessionID, transaction.getBuyerID().toString()),
-                        sessionKeyService.aesDecryptMessage(sessionID, transaction.getSellerID().toString()),
-                        sessionKeyService.aesDecryptMessage(sessionID, transaction.getTotalCost().toString())
+                        encryptionUtil.serverAESEncrypt(sessionKey, transaction.getTransactionID().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, transaction.getBuyerID().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, transaction.getSellerID().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, transaction.getTotalCost().toString())
                 );
                 encryptedTransactions.add(encryptedTransaction);
             }

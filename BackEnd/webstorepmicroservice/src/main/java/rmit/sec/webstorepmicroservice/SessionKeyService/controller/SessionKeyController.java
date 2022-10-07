@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import rmit.sec.webstorepmicroservice.SessionKeyService.requests.EncryptedDataRequest;
 import rmit.sec.webstorepmicroservice.SessionKeyService.services.SessionKeyService;
+import rmit.sec.webstorepmicroservice.utils.EncryptionUtil;
 
 
 @RestController
@@ -31,7 +32,7 @@ public class SessionKeyController {
         return sessionKeyService.keyExchange(encryptedDataRequest.getEncryptedData());
     }
 
-
+    // TEST ENDPOINTS -----------------------------------------------------------
     // This endpoint is used to test decrypting message sent with encrypted data
     @GetMapping(path = "/aesDecrypt")
     public String serverAESDecrypt(@RequestBody EncryptedDataRequest request){
@@ -53,5 +54,6 @@ public class SessionKeyController {
     public String serverRSADecrypt(@RequestBody EncryptedDataRequest request){
         return sessionKeyService.rsaDecryptMessage(request.getEncryptedData());
     }
+    // TEST ENDPOINTS -----------------------------------------------------------
 
 }

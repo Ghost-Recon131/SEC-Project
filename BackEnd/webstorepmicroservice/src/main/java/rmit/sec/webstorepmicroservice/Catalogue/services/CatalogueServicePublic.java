@@ -60,17 +60,18 @@ public class CatalogueServicePublic {
         List<EncryptedCatalogueItem> encryptedCatalogueItems = new ArrayList<>();
         try{
             // Encrypt fields of each item then add to another arraylist
+            String sessionKey = sessionKeyService.getAESKey(sessionID);
             for (CatalogueItem catalogueItem : items) {
                 EncryptedCatalogueItem encryptedCatalogueItem = new EncryptedCatalogueItem(
-                        sessionKeyService.aesEncryptMessage(sessionID, catalogueItem.getItemID().toString()),
-                        sessionKeyService.aesEncryptMessage(sessionID, catalogueItem.getSellerID().toString()),
-                        sessionKeyService.aesEncryptMessage(sessionID, catalogueItem.getItemName()),
-                        sessionKeyService.aesEncryptMessage(sessionID, catalogueItem.getItemDescription()),
-                        sessionKeyService.aesEncryptMessage(sessionID, catalogueItem.getItemAvailable().toString()),
-                        sessionKeyService.aesEncryptMessage(sessionID, catalogueItem.getItemPrice().toString()),
-                        sessionKeyService.aesEncryptMessage(sessionID, catalogueItem.getItemQuantity().toString()),
-                        sessionKeyService.aesEncryptMessage(sessionID, catalogueItem.getItemImage()),
-                        sessionKeyService.aesEncryptMessage(sessionID, catalogueItem.getItemCategory().toString())
+                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemID().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getSellerID().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemName()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemDescription()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemAvailable().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemPrice().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemQuantity().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemImage()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, catalogueItem.getItemCategory().toString())
                 );
                 encryptedCatalogueItems.add(encryptedCatalogueItem);
             }
