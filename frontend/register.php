@@ -38,7 +38,7 @@
 
     <h1>Sign Up</h1>
     <h4>It's free and only takes a minute</h4>
-    <form class="form" id="form"  >
+    <form class="form" id="form" action="process_register.php" method="post" >
         <label>Username</label>
         <input type="text" placeholder="Enter Username" id="username" name="username" required="required" >
 
@@ -55,7 +55,7 @@
         <input type="password" placeholder="Enter Password" id="password" name="password" required="required" >
 
         <label>Confirm Password</label>
-        <input type="password" placeholder="Confirm Password" id="confirmPassword" required="required" >
+        <input type="password" placeholder="Confirm Password"  required="required" >
 
         <label>Secret Question</label>
         <input type="text" placeholder="Enter Secret Question" id="secret_question" name="secret_question" required="required" >
@@ -130,27 +130,7 @@
         <p>&copy; 2022, The Boys </p>
     </div>
 
-      <script>
-const formE1 = document.querySelector('.form');
 
-formE1.addEventListener('submit', event => {
-    event.preventDefault();
-
-    const formData = new FormData(formE1);
-    const data = Object.fromEntries(formData);
-
-    fetch('http://localhost:8080/api/RegisterLogin/register?sessionID=3' , {
-        method: 'POST',
-        headers:{
-            'Content-Type' : 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).then(res => res.json())
-    .then(data => console.log(data))
-});
-
-
-    </script>
 
 </footer>
 </body>

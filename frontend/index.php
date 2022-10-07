@@ -13,15 +13,32 @@
     <body>
     
     <section id="header">
-            <a href="#"><img src="tut/img/logo.png" class="logo"></a>
+            <a href="index.php"><img src="tut/img/logo.png" class="logo"></a>
+
+      
 <div>
 
     <ul id="navbar">
+
         <li><a class='active'href="index.php">Home</a></li>
         <li><a href="shop.php">Shop</a></li>
         <li><a href="login.php">Login</a></li>
+        <li><a href="register.php">Register</a></li>
         <li><a href="cart.php"><i class="fa-solid fa-cart-shopping"></i></a></li>
+      
+        <?php
+session_start();
+if(!isset($_SESSION['username'])) 
+        echo "";
 
+else {
+   echo "Welcome back ". $_SESSION["username"];
+ print  "<li><a href=logout.php>Logout</a></li>";
+ 
+   
+
+}
+    ?>
     </ul>
 </div>
 </section>
@@ -457,29 +474,7 @@
         </div>
 
     </footer>
-    <script>
-function RSA_encryption(){
 
-var plaintext = "hello";
-var lol =  fetch('http://localhost:8080/api/sessionKeyService/getServerPublicKey' , {
-    method: 'GET',
-    body: JSON.stringify(lol)
-    
-})
-
-var test = JSON.stringify(lol)
-// var encrypt = new JSEncrypt();
-// encrypt.setPublicKey(lol);
-// var encrypted = encrypt.encrypt(plaintext);
-
-console.log(test)
-}
-
-
-
-window.onload = RSA_encryption;
-
-    </script>
     </body>
 </html>
 

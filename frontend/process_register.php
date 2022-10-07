@@ -1,14 +1,16 @@
 <?php
- $firstname = $_POST['firstname'];
- $lastname  = $_POST['lastname'];
  $username  = $_POST['username'];
  $email     = $_POST['email'];
+ $firstname = $_POST['firstname'];
+ $lastname  = $_POST['lastname'];
  $password  = $_POST['password'];
+ $secret_question = $_POST['secret_question'];
+ $secret_question_answer = $_POST['secret_question_answer'];
  //connect to the server 
  $db = mysqli_connect("localhost", "root", "","ecommerce" );
 
 
-$q = "insert into users values(null, '$firstname',$lastname,$username,$email,$password, now())";
+$q = "insert into users values(null, '$username' ,'$email','$firstname','$lastname',SHA('$password'),'$secret_question','$secret_question_answer', now())";
 mysqli_query($db, $q);
 
 
@@ -19,10 +21,3 @@ mysqli_query($db, $q);
 header("Location:index.php");
 
 ?>
-
-
-firstname varchar(100),
-    lastname varchar(100),
-	username varchar(100),
-    email varchar(255),
-	password char(100),
