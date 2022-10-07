@@ -20,25 +20,29 @@
 
     <ul id="navbar">
 
-        <li><a class='active'href="index.php">Home</a></li>
-        <li><a href="shop.php">Shop</a></li>
-        <li><a href="login.php">Login</a></li>
-        <li><a href="register.php">Register</a></li>
-        <li><a href="cart.php"><i class="fa-solid fa-cart-shopping"></i></a></li>
+
       
         <?php
 session_start();
-if(!isset($_SESSION['username'])) 
-        echo "";
+if(!isset($_SESSION['username'])) {
 
+
+      print "<li><a class=active href=index.php>Home</a></li>";
+      print "<li><a href=shop.php>Shop</a></li>";
+      print "<li><a href=login.php>Login</a></li>";
+      print  "<li><a href=register.php>Register</a></li>";
+    
+}
 else {
-   echo "Welcome back ". $_SESSION["username"];
- print  "<li><a href=logout.php>Logout</a></li>";
- 
+    echo "<h4>Welcome back. $_SESSION[username]</h4>";
    
+    print "<li><a class=active href=index.php>Home</a></li>";
+    print "<li><a href=shop.php>Shop</a></li>";
+    print  "<li><a href=logout.php>Logout</a></li>";
 
 }
     ?>
+    <li><a href="cart.php"><i class="fa-solid fa-cart-shopping"></i></a></li>
     </ul>
 </div>
 </section>
