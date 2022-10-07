@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
     <script src="https://kit.fontawesome.com/999f694d3f.js" crossorigin="anonymous"></script>
+    <script src="sha256.js"></script>
     
 
 </head>
@@ -80,8 +80,9 @@ print  "<li><a href=logout.php>Logout</a></li>";
 
         <label>Secret Question Answer</label>
         <input type="text" placeholder="Enter Secret Answer" id="secret_question_answer" name="secret_question_answer" required="required" >
-
-        <input type="submit" value="Submit" id="submit">
+       
+        
+        <input type="submit" value="Submit" id="submit" onclick="hashPassword()">
 
 
     </form>
@@ -147,7 +148,18 @@ print  "<li><a href=logout.php>Logout</a></li>";
     <div class="copyright">
         <p>&copy; 2022, The Boys </p>
     </div>
+<script>
+		function hashPassword() {
+			var input = document.getElementById('password').value;
+			
+			var hash = SHA256.hash(input);
+			
+			document.getElementById("password").innerHTML = hash;
+			document.getElementById("password").value = hash;
+		}
+    
 
+</script>
 
 
 </footer>

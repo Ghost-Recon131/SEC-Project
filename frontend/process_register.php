@@ -9,15 +9,26 @@
  //connect to the server 
  $db = mysqli_connect("localhost", "root", "","ecommerce" );
 
+ $q1 = "select * from users where username='$username'";
+ $results = mysqli_query($db, $q1) or die(mysqli_error($db));
 
-$q = "insert into users values(null, '$username' ,'$email','$firstname','$lastname',SHA('$password'),'$secret_question','$secret_question_answer', now())";
-mysqli_query($db, $q);
+ if(mysqli_num_rows($results) > 0)
+    {
+            
+        header("Location:register.php");
+        
+    }
+    else {
+        $q = "insert into users values(null, '$username' ,'$email','$firstname','$lastname','$password','$secret_question','$secret_question_answer', now())";
+        mysqli_query($db, $q);
+        header("Location:index.php");
+    }
 
 
 
 
 
 
-header("Location:index.php");
+
 
 ?>
