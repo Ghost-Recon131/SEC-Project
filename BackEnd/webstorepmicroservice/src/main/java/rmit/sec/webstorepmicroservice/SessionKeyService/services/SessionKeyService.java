@@ -59,14 +59,15 @@ public class SessionKeyService {
         try{
             SessionKey sessionKeyObject = sessionKeyRepository.getBySessionID(sessionID);
 
-            // Check key is still valid
+            // Check key is still valid by checking if the current date is before the expiry date
             LocalDateTime currentDate = LocalDateTime.now();
-            if(currentDate.isAfter(sessionKeyObject.getExpiryDate())){
+            if(currentDate.isBefore(sessionKeyObject.getExpiryDate())){
                 aesSessionKey = encryptionUtil.serverRSADecrypt(sessionKeyObject.getSessionKey());
             }else{
                 logger.debug("Session key has expired");
-                deleteExpiredKeys();
+//                deleteExpiredKeys();
                 aesSessionKey = "EXPIRED";
+                logger.warn("Key expired");
             }
         }catch (Exception e){
             logger.error(e.getMessage());
@@ -106,14 +107,19 @@ public class SessionKeyService {
         return encryptionUtil.serverRSADecrypt(plainText);
     }
 
-    // Check DB for expired keys and then delete them
-    private void deleteExpiredKeys(){
-        LocalDateTime currentDate = LocalDateTime.now();
-        sessionKeyRepository.findAll().forEach(sessionKey -> {
-            if(currentDate.isAfter(sessionKey.getExpiryDate())){
-                sessionKeyRepository.deleteBySessionID(sessionKey.getSessionID());
-            }
-        });
-    }
+    // Check DB for expired keys and then delete them: NOTE THIS METHOD CURRENTLY DOES NOT WORK
+//    private void deleteExpiredKeys(){
+//        LocalDateTime currentDate = LocalDateTime.now();
+//        for (SessionKey sessionKey : sessionKeyRepository.findAll()) {
+//            if(sessionKey.getExpiryDate().isBefore(currentDate)){
+//                try{
+//                    sessionKeyRepository.deleteBySessionID(sessionKey.getSessionID());
+//                    logger.warn("Deleted expired session key with ID: " + sessionKey.getSessionID());
+//                }catch (Exception e){
+//                    logger.error(e.getMessage());
+//                }
+//            }
+//        }
+//    }
 
 }

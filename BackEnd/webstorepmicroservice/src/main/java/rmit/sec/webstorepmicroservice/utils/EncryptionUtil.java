@@ -7,6 +7,7 @@ import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PRIVATE;
 import static rmit.sec.webstorepmicroservice.security.SecurityConstant.RSA_PUBLIC;
@@ -90,14 +92,15 @@ public class EncryptionUtil {
     public String serverAESEncrypt(String sessionKey, String plainText){
         String encryptedMessage = null;
         try {
-            // Hash the original key with SHA-256 so the length and contents does not matter
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            byte[] hashedKey = messageDigest.digest(sessionKey.getBytes(StandardCharsets.UTF_8));
+            // Calculate the IV based off the session key
+            MessageDigest MD5 = MessageDigest.getInstance("MD5");
+            byte[] hashedIV = MD5.digest(sessionKey.getBytes(StandardCharsets.UTF_8));
+            AlgorithmParameterSpec iv = new IvParameterSpec(hashedIV);
 
             // Generate the encryption key
-            SecretKeySpec encryptionKey = new SecretKeySpec(hashedKey, "AES");
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, encryptionKey);
+            SecretKeySpec encryptionKey = new SecretKeySpec(Base64.getDecoder().decode(sessionKey), "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, iv);
 
             // Encrypt the plaintext then encode it to base64 and return as normal string
             byte[] encryptedValue = cipher.doFinal(plainText.getBytes());
@@ -112,14 +115,15 @@ public class EncryptionUtil {
     public String serverAESDecrypt(String sessionKey, String cipherText) {
         String decryptedMessage = null;
         try {
-            // Hash the original key with SHA-256 so the length and contents does not matter
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            byte[] hashedKey = messageDigest.digest(sessionKey.getBytes(StandardCharsets.UTF_8));
+            // Calculate the IV based off the session key
+            MessageDigest MD5 = MessageDigest.getInstance("MD5");
+            byte[] hashedIV = MD5.digest(sessionKey.getBytes(StandardCharsets.UTF_8));
+            AlgorithmParameterSpec iv = new IvParameterSpec(hashedIV);
 
             // Generate the decryption key used for AES
-            SecretKeySpec decryptionKey = new SecretKeySpec(hashedKey, "AES");
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, decryptionKey);
+            SecretKeySpec decryptionKey = new SecretKeySpec(Base64.getDecoder().decode(sessionKey), "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, decryptionKey, iv);
 
             // Decrypt the cipher text and decode it to a normal string
             byte[] decodeBase64 = Base64.getDecoder().decode(cipherText);
@@ -130,6 +134,5 @@ public class EncryptionUtil {
         }
         return decryptedMessage;
     }
-
 
 }
