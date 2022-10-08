@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@300;400;500&family=Exo+2:wght@500;600&family=Josefin+Sans:wght@300;400;500;700&display=swap');
+
+*{
+	font-family: 'Alegrya Sans';
+	color: #3AAFA9;
+	box-sizing: border-box;
+}
+
+html{
+	height: 100vh;
+	width: 100vw;
+}
+
+body{
+	height: 100%;
+	width:100%;
+	margin:0;
+	background-color: #DEF2F1;
+}
+
+#root{
+	height: 100%;
+	width: 100%;
+}
+
+:root{
+	--shadeOne: #FEFFFF;
+	--shadeTwo: #DEF2F1;
+	--shadeThree: #3AAFA9;
+	--shadeFour: #2B7A78;
+	--shadeFive: #17252A;
+}
