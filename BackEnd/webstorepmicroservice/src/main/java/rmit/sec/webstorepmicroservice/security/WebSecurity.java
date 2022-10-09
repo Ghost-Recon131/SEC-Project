@@ -69,7 +69,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/api/public/**").permitAll();
 
         // For End points that has restricted access
-        http.authorizeRequests().antMatchers("/api/authorised/**").hasAuthority("USER");
+        http.authorizeRequests().antMatchers("/api/authorised/**").permitAll();
 
         // Add a filter to validate the tokens with every request
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
