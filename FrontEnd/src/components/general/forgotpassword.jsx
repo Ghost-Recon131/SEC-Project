@@ -1,10 +1,8 @@
 import { getGlobalState, setGlobalState } from "components/utils/globalState";
 import axios from "axios";
 import { useState } from "react";
-import cookie from 'js-cookie'
-import {
-    useNavigate,
-} from 'react-router-dom';
+import {useNavigate,} from 'react-router-dom';
+import{clientAESEncrypt, clientAESDecrypt} from "../security/EncryptionUtils";
 
 
 export default function Component() {
@@ -21,18 +19,34 @@ export default function Component() {
 
     async function submit(event) {
         event.preventDefault();
-        console.log(JSON.stringify(formData))
-        try {
-            var res = await axios.post("https://0xq8werjoh.execute-api.us-east-1.amazonaws.com/live/RegisterLogin/resetforgottenpassword" + "?username=" + username, formData);
-            // console.log(JSON.stringify(res.data));
-            if (res.data.error) {
-                setError(res.data.error)
-                return
-            }
 
-            setError("Password reset successfully");
-        } catch (resError) {
-            setError(resError.response.data.error)
+        // Check the password and confirm password fields match
+        if(newPassword !== confirmNewPassword){
+            setError("Passwords do not match");
+        }else{
+            // If they match, empty any possible error text then send the request to the server
+            setError("");
+            try {
+                const data = {
+                    "username": clientAESEncrypt(username),
+                    "secret_question": clientAESEncrypt(secretQuestion),
+                    "secret_question_answer": clientAESEncrypt(secretQuestionAnswer),
+                    "newPassword": clientAESEncrypt(newPassword)
+                }
+                const sessionID = sessionStorage.getItem('sessionID');
+                var res = await axios.post(getGlobalState("backendDomain")+"/api/authorised/viewAccountInfo?sessionID=" + sessionID, data);
+
+                // Check response from server, then redirect to log in on success or display error on failure
+                res = clientAESDecrypt(res.data);
+                if(res === "Password successfully changed") {
+                    setError("Password reset successfully");
+                    navigate("/login");
+                }else{
+                    setError(res);
+                }
+            }catch (resError) {
+                setError("Exception occurred while resetting password");
+            }
         }
     }
 

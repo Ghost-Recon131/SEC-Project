@@ -3,42 +3,56 @@ import cookie from "js-cookie";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import {clientAESDecrypt} from "../security/EncryptionUtils";
 
 export default function Component() {
-    var navigate = useNavigate();
-    // initial state
-    var [accountInfo, setAccountInfo] = useState([]);
-
-
+    const navigate = useNavigate();
+    const token = sessionStorage.getItem('jwt-token')
+    const sessionID = sessionStorage.getItem('sessionID')
     var [user, setUser] = useState({});
 
 
+    // As this page requires user to be logged in, we check if they have a valid login
     useEffect(() => {
+        if (!token){
+            navigate('/login')
+            console.log("no valid login detected")
+        }else{
+            async function getUserInfo(){
+                let currentUserDetails = await axios.get(getGlobalState("backendDomain") + "/api/authorised/viewAccountInfo?sessionID=" + sessionID,
+                    {headers: {Authorization: token}});
 
-        // Verify user is logged in
-        if (cookie.get("user")) {
-            user = JSON.parse(cookie.get("user"));
-            setUser(user);
-
-        } else {
-            navigate("/signin");
+                // Decrypt the data and set data to current user object
+                currentUserDetails = currentUserDetails.data
+                if(currentUserDetails){
+                    user = {
+                        "id": clientAESDecrypt(currentUserDetails.id),
+                        "username": clientAESDecrypt(currentUserDetails.username),
+                        "email": clientAESDecrypt(currentUserDetails.email),
+                        "firstname": clientAESDecrypt(currentUserDetails.firstname),
+                        "lastname": clientAESDecrypt(currentUserDetails.lastname),
+                        "secretQuestion": clientAESDecrypt(currentUserDetails.secretQuestion),
+                    }
+                    setUser(user);
+                }
+            }
+            try{
+                getUserInfo()
+            }catch (e) {
+                console.log(e)
+            }
         }
-
-        async function axiosPost() {
-            var res = await axios.get("https://bjge6rs3se.execute-api.us-east-1.amazonaws.com/AccountInfo/api/AccountInfo/getAccountInfo?userID=" + user.id);
-            setAccountInfo(res.data);
-        }
-        axiosPost();
     }, []);
 
     return (
         <div>
             <h3 className="text-2xl font-bold text-white shadow-md rounded pt-2 pb-8 mb-4">Account Info</h3>
             <p>Account ID: {user.id}</p>
-            <p>Email / username: {user.username}</p>
-            <p>DOB: {accountInfo.dob}</p>
-            <p>Phone Number: {accountInfo.phone}</p>
-            <p>Address: {accountInfo.address}</p>
+            <p>Username: {user.username}</p>
+            <p>Email: {user.email}</p>
+            <p>First Name: {user.firstname}</p>
+            <p>Last Name: {user.lastname}</p>
+            <p>Secret question: {user.secretQuestion}</p>
         </div>
     );
 }

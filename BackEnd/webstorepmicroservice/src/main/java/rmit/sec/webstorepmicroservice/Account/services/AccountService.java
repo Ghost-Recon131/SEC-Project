@@ -119,6 +119,7 @@ public class AccountService implements UserDetailsService {
                     String newPassword = bCryptPasswordEncoder.encode(request.getNewPassword());
                     account.setPassword(newPassword);
                     accountRepository.save(account);
+                    result = "Password successfully changed";
                 }else{
                     result = "The provided secret question and or answer to secret question is invalid.";
                 }

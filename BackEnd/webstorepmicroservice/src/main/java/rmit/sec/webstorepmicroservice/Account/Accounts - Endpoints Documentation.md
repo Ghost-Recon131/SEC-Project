@@ -77,7 +77,7 @@ Current Domain is localhost: http://localhost:8080/
 
 ## Update account information
 * Request Method: PUT
-* Endpoint URI: api/authorised/viewAccountInfo?sessionID=
+* Endpoint URI: api/authorised/updateAccountInfo?sessionID=
 * JWT Token must be present in header
 * Takes a param of "sessionID" as a Long
 ```json

@@ -1,18 +1,45 @@
 import { getGlobalState, setGlobalState } from "components/utils/globalState";
 import axios from "axios";
-import { useState } from "react";
-import cookie from 'js-cookie'
-import {
-    useNavigate,
-} from 'react-router-dom';
+import {useEffect, useState} from "react";
+import {useNavigate,} from 'react-router-dom';
+import {clientAESDecrypt, clientAESEncrypt} from "../security/EncryptionUtils";
 
 
 export default function Component() {
-    var [formData, setFormData] = useState({address: "", dob: "", phone: "" });
-    var { userID, address, dob , phone} = formData;
-    // TODO: get userID variable from cookie
+    // Setup variables for use later
+    var [formData, setFormData] = useState({email: "", firstname: "", lastname: "" });
+    var {email, firstname, lastname} = formData;
     var [error, setError] = useState("");
     const navigate = useNavigate();
+    const token = sessionStorage.getItem('jwt-token')
+    const sessionID = sessionStorage.getItem('sessionID')
+
+    // As this page requires user to be logged in, we check if they have a valid login
+    useEffect(() => {
+        if (!token){
+            navigate('/login')
+            console.log("no valid login detected")
+        }else{
+            async function preFillCurrentUserInfo(){
+                let currentUserDetails = await axios.get(getGlobalState("backendDomain") + "/api/authorised/viewAccountInfo?sessionID=" + sessionID,
+                    {headers: {Authorization: token}});
+
+                currentUserDetails = currentUserDetails.data
+                // Decrypt the data and prefill current values
+                if(currentUserDetails){
+                    email = clientAESDecrypt(currentUserDetails.email)
+                    firstname = clientAESDecrypt(currentUserDetails.firstname)
+                    lastname = clientAESDecrypt(currentUserDetails.lastname)
+                }
+            }
+            try{
+                preFillCurrentUserInfo()
+            }catch (e) {
+                console.log(e)
+            }
+        }
+    }, []);
+
 
     function formInputs(event) {
         event.preventDefault();
@@ -20,19 +47,30 @@ export default function Component() {
         setFormData({ ...formData, [name]: value });
     }
 
+    // Function to submit the updated data to backend
     async function submit(event) {
         event.preventDefault();
-        console.log(JSON.stringify(formData))
         try {
-            var res = await axios.put("https://bjge6rs3se.execute-api.us-east-1.amazonaws.com/AccountInfo/api/AccountInfo/updateaccountinfo" + userID, formData);
-            console.log(JSON.stringify(res.data));
-            if(res.data.error){
-                setError(res.data.error)
-                return
+            // Construct the encrypted data object
+            const data = {
+                "email": clientAESEncrypt(email),
+                "firstname": clientAESEncrypt(firstname),
+                "lastname": clientAESEncrypt(lastname)
             }
-            setError("Account details updated");
+
+            // Send to backend and check response
+            let res = await axios.put(getGlobalState("backendDomain") + "/api/authorised/updateAccountInfo?sessionID=" + sessionID,
+                data, {headers: {Authorization: token}});
+            res = clientAESDecrypt(res.data);
+            // If successful, reload the page with current details, otherwise display error
+            if(res === "Account details updated successfully!"){
+                setError("")
+                window.location.reload()
+            }else{
+                setError(res);
+            }
         } catch (resError) {
-            setError(resError.response.data.error)
+            setError("Exception occurred when updating account info");
         }
     }
 
@@ -44,10 +82,10 @@ export default function Component() {
             <h1 className="text-3xl font-bold mb-10">Update Account Details</h1>
             <div className="mb-4">
                 <label className="block text-grey-darker text-sm font-bold mb-2">
-                    Address
+                    Email
                 </label>
                 <input
-                    value={address}
+                    value={email}
                     name="address"
                     onChange={formInputs}
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
@@ -58,37 +96,36 @@ export default function Component() {
             </div>
             <div className="mb-6">
                 <label className="block text-grey-darker text-sm font-bold mb-2">
-                    DOB
+                    firstname
                 </label>
                 <input
-                    value={dob}
-                    name="dob"
+                    value={firstname}
+                    name="firstname"
                     onChange={formInputs}
                     className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
                     type="text"
-                    placeholder="dob"
+                    placeholder="firstname"
                     required
                 />
             </div>
             <div className="mb-6">
                 <label className="block text-grey-darker text-sm font-bold mb-2">
-                    phone
+                    lastname
                 </label>
                 <input
-                    value={phone}
-                    name="phone"
+                    value={lastname}
+                    name="lastname"
                     onChange={formInputs}
                     className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
                     type="text"
-                    placeholder="+61 0412 345 678"
+                    placeholder="lastname"
                     required
                 />
             </div>
             <div className="flex items-center justify-between">
                 <button
                     className="bg-blue-500 hover:bg-blue-dark text-white font-bold py-2 px-4 rounded"
-                    type="submit"
-                >
+                    type="submit">
                     Update Details
                 </button>
             </div>
