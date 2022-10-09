@@ -1,15 +1,13 @@
-import { getGlobalState, setGlobalState } from "components/utils/globalState";
 import axios from "axios";
 import { useState } from "react";
-import cookie from 'js-cookie'
-import {
-    useNavigate,
-} from 'react-router-dom';
+import {useNavigate,} from 'react-router-dom';
+import {getGlobalState} from "../utils/globalState";
+import {clientAESEncrypt, clientAESDecrypt} from "../security/EncryptionUtils";
 
 
 export default function Component() {
-    var [formData, setFormData] = useState({ fullName: "", username: "", password: "", secretQuestion: "", secretQuestionAnswer: "" });
-    var { fullName, username, password, secretQuestion, secretQuestionAnswer } = formData;
+    var [formData, setFormData] = useState({username: "", email: "", firstname: "", lastname: "", password: "", confirmPassword: "", secretQuestion: "", secretQuestionAnswer: "" });
+    var { username, email, firstname, lastname, password, confirmPassword, secretQuestion, secretQuestionAnswer } = formData;
     var [error, setError] = useState("");
     const navigate = useNavigate();
 
@@ -21,18 +19,32 @@ export default function Component() {
 
     async function submit(event) {
         event.preventDefault();
-        console.log(JSON.stringify(formData))
-        try {
-            var res = await axios.post("https://0xq8werjoh.execute-api.us-east-1.amazonaws.com/live/RegisterLogin", formData);
-            console.log(JSON.stringify(res.data));
-            if (res.data.error) {
-                setError(res.data.error)
-                return
+        if(confirmPassword !== password){
+            setError("Your passwords do not match");
+        }else{
+            setError("")
+            try {
+                const data = {
+                    "username": clientAESEncrypt(username),
+                    "email": clientAESEncrypt(email),
+                    "firstname": clientAESEncrypt(firstname),
+                    "lastname": clientAESEncrypt(lastname),
+                    "password": clientAESEncrypt(password),
+                    "secret_question": clientAESEncrypt(secretQuestion),
+                    "secret_question_answer": clientAESEncrypt(secretQuestionAnswer)
+                };
+                const sessionID = sessionStorage.getItem('sessionID')
+                var res = await axios.post(getGlobalState("backendDomain") + "/api/RegisterLogin/register?sessionID=" + sessionID, data);
+                res = clientAESDecrypt(res.data);
+                if (res === "Signup Successful") {
+                    setError("Account created successfully");
+                    navigate("/signin");
+                }else{
+                    setError(res)
+                }
+            } catch (e) {
+                setError(e)
             }
-
-            setError("Account created successfully");
-        } catch (resError) {
-            setError(resError.response.data.error)
         }
     }
 
@@ -44,11 +56,25 @@ export default function Component() {
             <h1 className="text-3xl font-bold mb-10">Register</h1>
             <div className="mb-4">
                 <label className="block text-grey-darker text-sm font-bold mb-2">
-                    Full Name
+                    Firstname
                 </label>
                 <input
-                    value={fullName}
-                    name="fullName"
+                    value={firstname}
+                    name="firstname"
+                    onChange={formInputs}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                    type="text"
+                    placeholder="John Person"
+                    required
+                />
+            </div>
+            <div className="mb-4">
+                <label className="block text-grey-darker text-sm font-bold mb-2">
+                    lastname
+                </label>
+                <input
+                    value={lastname}
+                    name="lastname"
                     onChange={formInputs}
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
                     type="text"
@@ -70,6 +96,20 @@ export default function Component() {
                     required
                 />
             </div>
+            <div className="mb-4">
+                <label className="block text-grey-darker text-sm font-bold mb-2">
+                    Email
+                </label>
+                <input
+                    value={email}
+                    name="email"
+                    onChange={formInputs}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                    type="text"
+                    placeholder="email"
+                    required
+                />
+            </div>
             <div className="mb-6">
                 <label className="block text-grey-darker text-sm font-bold mb-2">
                     Password
@@ -81,6 +121,20 @@ export default function Component() {
                     className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
                     type="password"
                     placeholder="Password"
+                    required
+                />
+            </div>
+            <div className="mb-6">
+                <label className="block text-grey-darker text-sm font-bold mb-2">
+                    Confirm Password
+                </label>
+                <input
+                    value={confirmPassword}
+                    name="confirmPassword"
+                    onChange={formInputs}
+                    className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
+                    type="password"
+                    placeholder="confirmPassword"
                     required
                 />
             </div>
