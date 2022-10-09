@@ -23,14 +23,12 @@ async function keyExchange(){
         encryptedData: sessionSecret
     })).data
 
-
     // Check response from backend, if we have a JWT token, then save it, otherwise throw an error
     if (sessionID){
         sessionStorage.setItem('sessionID', sessionID)
     }else{
         console.error("key exchange failed")
     }
-
 }
 
 

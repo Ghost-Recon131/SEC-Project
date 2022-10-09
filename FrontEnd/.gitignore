@@ -1,7 +1,6 @@
 # Other files
 *.iml
 *.jar
-BackEnd/webstorepmicroservice/src/main/resources/application-production.properties
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -236,5 +235,8 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
-/FrontEnd/node_modules/
-/FrontEnd/old/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
