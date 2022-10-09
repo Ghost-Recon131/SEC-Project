@@ -7,7 +7,8 @@ export default function Component() {
   function accountList(event) {
     event.preventDefault();
     if (event.target.value === "signOut") {
-      cookie.remove("user");
+      sessionStorage.removeItem("jwt-token");
+      sessionStorage.removeItem("user");
       navigate("/");
     } else if (event.target.value === "newListing") {
       navigate("/newlisting");
@@ -20,9 +21,9 @@ export default function Component() {
   }
 
   // Convert from string to object
-  var user = {};
-  if (cookie.get("user")) {
-    user = JSON.parse(cookie.get("user"));
+  if (sessionStorage.getItem("user")) {
+    var user = sessionStorage.getItem("user")
+    console.log("View user cookie: " + user);
   }
   return (
     <nav className="font-sans flex flex-col text-center sm:flex-row sm:text-left sm:justify-between py-4 px-6  shadow sm:items-baseline w-full">
@@ -39,7 +40,7 @@ export default function Component() {
 
 
         <div>
-          {user.username ? (
+          {user ? (
               <div className="rounded hover:font-medium hover:text-gray-400 md:mx-2">
               </div>
           ) : (
@@ -54,7 +55,7 @@ export default function Component() {
 
 
         <div>
-          {user.username ? (
+          {user? (
               <div className="rounded hover:font-medium hover:text-gray-400 md:mx-2">
               </div>
           ) : (
@@ -68,14 +69,14 @@ export default function Component() {
         </div>
 
 
-        {user.username ? (
+        {user ? (
           <div className="rounded hover:font-medium hover:text-gray-400 md:mx-2">
             <select
               className="custom-select text-capitalize bg-black"
               onChange={accountList}
               value=""
             >
-              <option hidden>{user.username}</option>
+              <option hidden>{user}</option>
               <option value="newListing">New Listing</option>
               <option value="viewAccountInfo">View Account info</option>
               <option value="viewtransactions">View purchases</option>

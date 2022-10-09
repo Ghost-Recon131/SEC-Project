@@ -23,8 +23,8 @@ export default function Component() {
 
     // Encrypt our data
     const data = {
-        username: clientAESEncrypt(username),
-        password: clientAESEncrypt(password),
+        "username": clientAESEncrypt(username),
+        "password": clientAESEncrypt(password),
     }
 
     // Post login info to backend
@@ -34,20 +34,13 @@ export default function Component() {
       // Set the JWT token in session storage, then take user back to home
       if(token.startsWith("Bearer ")){
         sessionStorage.setItem('jwt-token', token)
+
         // Get the user's account info using JWT token
         const getUserDetails = await axios.get(getGlobalState("backendDomain") + "/api/authorised/viewAccountInfo?sessionID=" + sessionID, {headers: {Authorization: token}});
         let encryptedUserDetails = getUserDetails.data
-        const userDetails = {
-            id: clientAESDecrypt(encryptedUserDetails.id),
-            username: clientAESDecrypt(encryptedUserDetails.username),
-            email: clientAESDecrypt(encryptedUserDetails.email),
-            firstname: clientAESDecrypt(encryptedUserDetails.firstname),
-            lastname: clientAESDecrypt(encryptedUserDetails.lastname),
-            secretQuestion: clientAESDecrypt(encryptedUserDetails.secretQuestion),
-        }
-        // using cookie here as we cannot save JSON objects in session storage
-        cookie.set("user", userDetails)
-        // navigate("/")
+        sessionStorage.setItem("user", clientAESDecrypt(encryptedUserDetails.email))
+        // Take user back to home after successful login
+        navigate("/")
         setError("");
       }
     }catch(e){
