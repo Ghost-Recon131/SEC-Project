@@ -14,7 +14,7 @@ function SignUp() {
       title="Sign Up" 
       buttonName="Register" 
       redirectPage="/login" 
-      redirectText="Already have an account? Sign in!"
+      redirectText="Have an account? Head to Sign in"
       handleSubmit={registerLogic}
     />
   );

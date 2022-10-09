@@ -1,8 +1,10 @@
 import axios from 'axios'
-import {clientAESDecrypt, clientAESEncrypt} from './EncryptionUtils'
+import {clientAESEncrypt} from './EncryptionUtils'
 
-async function loginLogic(username, password){
+async function loginLogic(username, email, firstname, lastname, password, secret_question, secret_answer){
     const sessionID = sessionStorage.getItem('sessionID')
+    let response = null
+    let token = null
 
     // Calculate the ciphertext
     const encryptedUsername = clientAESEncrypt(username);
@@ -10,24 +12,24 @@ async function loginLogic(username, password){
 
     // Make POST request to backend
     try{
-        const response = await axios.post(`http://localhost:8080/api/RegisterLogin/login?sessionID=`+ sessionID,
+        response = await axios.post(`http://localhost:8080/api/RegisterLogin/login?sessionID=`+ sessionID,
             {
                 username: encryptedUsername,
                 password: encryptedPassword
             }
         );
-        var token = response.data.token
+        token = response.data.token;
+
         // Check response from backend, if we have a JWT token, then save it, otherwise throw an error
-        if (token){
+        if(token.startsWith("Bearer ")){
             sessionStorage.setItem('jwt-token', token)
-            console.log("jwt-token: " + sessionStorage.getItem('jwt-token'))
-        }else{
-            console.error("failed to login")
+            // console.log("jwt-token: " + sessionStorage.getItem('jwt-token'))
         }
     }catch (e) {
-        console.log("Session ID: " + e)
-        console.log("Error:  \n" + e)
+        token = "Invalid credentials"
+        console.error("failed to login")
     }
+    return token
 }
 
 export default loginLogic
