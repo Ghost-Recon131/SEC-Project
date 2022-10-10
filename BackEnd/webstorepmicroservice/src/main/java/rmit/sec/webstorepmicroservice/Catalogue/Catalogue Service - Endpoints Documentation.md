@@ -46,7 +46,7 @@ Current Domain is localhost: http://localhost:8080/
 
 
 ## Get Product By ID
-* Request Method: GET
+* Request Method: POST
 * Endpoint URI: /api/catalogue/viewItem
 * Requires param of "sessionID"
 ```json

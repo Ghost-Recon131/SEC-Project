@@ -24,7 +24,7 @@ public class CatalogueControllerPublic {
     private TypeConvertUtil typeConvertUtil;
 
     // Get single item by its ID
-    @GetMapping("/viewItem")
+    @PostMapping("/viewItem")
     public EncryptedCatalogueItem getItemByID(@RequestParam Long sessionID, @RequestBody EncryptedItemViewRequest request) {
         // Get the session key then decrypt the request
         Long itemID = typeConvertUtil.convertToLong(sessionKeyService.aesDecryptMessage(sessionID, request.getItemID()));
