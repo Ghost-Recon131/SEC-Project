@@ -40,7 +40,7 @@ Current Domain is localhost: http://localhost:8080/
 
 ### Get all Available items
 * Request Method: GET
-* Endpoint URI: /api/catalogue/allItemsByCategory
+* Endpoint URI: /api/catalogue/allAvailableItems
 * Requires param of "sessionID"
 * Returns arraylist of encrypted JSON objects
 

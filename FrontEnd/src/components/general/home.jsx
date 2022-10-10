@@ -23,7 +23,7 @@ export default function Component() {
       async function axiosPost() {
         const res = await axios.get(
           getGlobalState("backendDomain") +
-            "/api/catalogue/allItems?sessionID=" +
+            "/api/catalogue/allAvailableItems?sessionID=" +
             sessionID
         );
         let tempProduct = [];
