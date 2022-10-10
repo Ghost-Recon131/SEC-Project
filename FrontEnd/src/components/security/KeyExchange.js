@@ -18,13 +18,13 @@ async function keyExchange(){
     rsa.setPublicKey(publicKey);
     sessionSecret = rsa.encrypt(secretKey)
 
-    // Make POST request to backend
-    sessionID = (await axios.post(getGlobalState("backendDomain") + `/api/sessionKeyService/getServerPublicKey`),
-        {
+    // Construct data to finish key exchange
+    const data =  {
         sessionID: 0, // this is a dummy sessionID value as backend ignores it
         encryptedData: sessionSecret
-    }).data;
-
+    }
+    // Make POST request to backend
+    sessionID = (await axios.post(getGlobalState("backendDomain") + `/api/sessionKeyService/keyExchange`, data)).data;
     // Check response from backend, if we have a JWT token, then save it, otherwise throw an error
     if (sessionID){
         localStorage.setItem('sessionID', sessionID)
@@ -44,7 +44,6 @@ const secretKeyGenerator = (length = 32) => {
     for (let i = 0; i < length; i++) {
         randomString += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-
     return randomString;
 };
 
