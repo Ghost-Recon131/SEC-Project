@@ -1,6 +1,9 @@
 import { createGlobalState } from 'react-hooks-global-state'
 
 export let{ getGlobalState, setGlobalState } = createGlobalState({
-  // TODO: Backend domain link change for AWS link once deployed
-backendDomain: 'http://localhost:8080',
+    // This is for local testing, comment out when deploying
+    // backendDomain: 'http://localhost:8080',
+
+    // Below is for AWS deployment, uncomment when deploying
+    backendDomain: 'https://sec-backend.s3843790-cc.com'
 })

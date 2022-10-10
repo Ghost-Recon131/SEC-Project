@@ -1,12 +1,13 @@
 import axios from 'axios'
 import JSEncrypt from 'jsencrypt'
+import {getGlobalState} from "../utils/globalState";
 
 async function keyExchange(){
     let sessionID = null
     let sessionSecret = null
 
     // Get RSA public key from server
-    const publicKey = (await axios.get(`http://localhost:8080/api/sessionKeyService/getServerPublicKey`)).data;
+    const publicKey = (await axios.get(getGlobalState("backendDomain") + `/api/sessionKeyService/getServerPublicKey`)).data;
 
     // Generate random secret
     const secretKey = secretKeyGenerator()
@@ -18,10 +19,11 @@ async function keyExchange(){
     sessionSecret = rsa.encrypt(secretKey)
 
     // Make POST request to backend
-    sessionID = (await axios.post(`http://localhost:8080/api/sessionKeyService/keyExchange`, {
+    sessionID = (await axios.post(getGlobalState("backendDomain") + `/api/sessionKeyService/getServerPublicKey`),
+        {
         sessionID: 0, // this is a dummy sessionID value as backend ignores it
         encryptedData: sessionSecret
-    })).data
+    }).data;
 
     // Check response from backend, if we have a JWT token, then save it, otherwise throw an error
     if (sessionID){
