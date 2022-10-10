@@ -3,6 +3,7 @@ import cookie from "js-cookie";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
+import {clientAESDecrypt, clientAESEncrypt} from "../security/EncryptionUtils";
 
 export default function Component() {
   const navigate = useNavigate();
@@ -16,42 +17,36 @@ export default function Component() {
     }
   }, []);
 
-  // "itemID": "NULL",
-  // "itemName": itemName,
-  // "itemDescription": itemDescription,
-  // "itemAvailable": "NULL",
-  // "itemPrice": price,
-  // "itemQuantity": itemQuantity,
-  // "itemImage": "NULL",
-  // "category": "NULL"
-
 
   // Setup variables to list new items
+  const [formData, setFormData] = useState({
+    itemID: "",
+    itemName: "",
+    itemDescription: "",
+    itemAvailable: "",
+    itemPrice: "",
+    itemQuantity: "",
+    itemImage: "",
+    category: "OTHER"
+  });
   const {itemName, itemDescription, itemPrice, itemQuantity, itemImage, category} = formData;
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({
-    itemName: "",
-    price: "",
-    itemCondition: "",
-    itemDescription: "",
-  });
   const [confirm, setConfirm] = useState(false);
 
   // Part of drop down menu for item condition
   let itemCategory = [
-    { label: "ELECTRONICS", value: "ELECTRONICS" },
-    { label: "BOOKS", value: "BOOKS" },
-    { label: "CLOTHING", value: "CLOTHING" },
+    {label: "ELECTRONICS", value: "ELECTRONICS" },
+    {label: "BOOKS", value: "BOOKS" },
+    {label: "CLOTHING", value: "CLOTHING" },
     {label: "GAMES", value: "GAMES"},
     {label: "FOOD", value: "FOOD"},
     {label: "OTHER", value: "OTHER"}
   ]
-  let [itemCategoryDropDown, setItemCategoryDropDown] = useState("UNDEFINED")
 
-  let handleItemConditionChange = (e) => {
-    setItemCategoryDropDown(e.target.value)
+  let handleItemCategoryChange = (e) => {
+    console.log(e.target.value)
+    setFormData({...formData, category: e.target.value});
   }
-
 
   function formInputs(event) {
     event.preventDefault();
@@ -63,84 +58,62 @@ export default function Component() {
   async function formSubmit(event) {
     event.preventDefault();
     try {
-      setFormData({...formData, itemCondition: itemCategoryDropDown});
-
       const data = {
-        "itemID": "NULL",
-        "itemName": itemName,
-        "itemDescription": itemDescription,
-        "itemAvailable": "NULL",
-        "itemPrice": itemPrice,
-        "itemQuantity": itemQuantity,
-        "itemImage": "NULL",
-        "category": "NULL"
+        "itemID": clientAESEncrypt("NULL"),
+        "itemName": clientAESEncrypt(itemName),
+        "itemDescription": clientAESEncrypt(itemDescription),
+        "itemAvailable": clientAESEncrypt("NULL"),
+        "itemPrice": clientAESEncrypt(itemPrice),
+        "itemQuantity": clientAESEncrypt(itemQuantity),
+        "itemImage": clientAESEncrypt(itemImage),
+        "itemCategory": clientAESEncrypt(category)
       }
 
-      // Create listing
-      var res1 = await axios.post(getGlobalState("backendDomain") + "/api/authorised/catalogue/listItem?sessionID=" + sessionID, data);
+      console.table("JSON OBJECT" + JSON.stringify(data));
 
-      //
-      navigate("/");
-    } catch (resError) {
-      setError(resError.response.data.error);
+      // Send listing data to backend
+      let response = await axios.post(getGlobalState("backendDomain") + "/api/authorised/catalogue/listItem?sessionID=" + sessionID,
+          data, {headers: {Authorization: token}});
+      response = clientAESDecrypt(response.data);
+
+      // If response is success, redirect user to home page, otherwise display error
+      if(response === "Successfully listed item"){
+        setError("")
+        navigate("/");
+      }else{
+        setError(response);
+      }
+    }catch (resError) {
+      setError("Exception occurred while listing item");
+      console.log("Item listing exception: \n", resError);
     }
   }
 
   return (
       <form
           onSubmit={formSubmit}
-          className="bg-white text-black shadow-md rounded px-96 pt-6 pb-8 mb-4 flex flex-col"
-      >
+          className="bg-white text-black shadow-md rounded px-96 pt-6 pb-8 mb-4 flex flex-col">
         <h1 className="text-3xl font-bold mb-10">Create new item listing</h1>
         <div className="mb-4">
           <label className="block text-grey-darker text-sm font-bold mb-2">
-            listingTitle
+            Listing Title
           </label>
           <input
               value={itemName}
-              name="listingTitle"
+              name="itemName"
               onChange={formInputs}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
               type="text"
-              placeholder="intresting title"
-              required
-          />
+              placeholder="interesting title or name of what you are selling"
+              required/>
         </div>
         <div className="mb-6">
           <label className="block text-grey-darker text-sm font-bold mb-2">
-          itemPrice
-          </label>
-          <input
-              value={itemPrice}
-              name="price"
-              onChange={formInputs}
-              className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
-              type="text"
-              placeholder="42"
-              required
-          />
-        </div>
-
-
-        <div className="mb-6">
-          <label className="block text-grey-darker text-sm font-bold mb-2">
-            itemCondition
-          </label>
-          <select onChange={handleItemConditionChange}>
-            <option value="UNDEFINED"> -- Select your item's condition -- </option>
-            {
-              itemCategory.map((itemConditionDropDown) => <option value={itemConditionDropDown.value}>{itemConditionDropDown.label}</option>)
-            }
-          </select>
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-grey-darker text-sm font-bold mb-2">
-            description
+            Description
           </label>
           <input
               value={itemDescription}
-              name="description"
+              name="itemDescription"
               onChange={formInputs}
               className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
               type="text"
@@ -148,8 +121,59 @@ export default function Component() {
               required
           />
         </div>
-
-
+        <div className="mb-6">
+          <label className="block text-grey-darker text-sm font-bold mb-2">
+          Price (in AUD)
+          </label>
+          <input
+              value={itemPrice}
+              name="itemPrice"
+              onChange={formInputs}
+              className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
+              type="text"
+              placeholder="42.55"
+              required
+          />
+        </div>
+        <div className="mb-6">
+          <label className="block text-grey-darker text-sm font-bold mb-2">
+            Quantity
+          </label>
+          <input
+              value={itemQuantity}
+              name="itemQuantity"
+              onChange={formInputs}
+              className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
+              type="number"
+              placeholder="42"
+              required
+          />
+        </div>
+        <div className="mb-6">
+          <label className="block text-grey-darker text-sm font-bold mb-2">
+            Image URL
+          </label>
+          <input
+              value={itemImage}
+              name="itemImage"
+              onChange={formInputs}
+              className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
+              type="text"
+              placeholder="https://www.example.com/image.png"
+              required
+          />
+        </div>
+        <div className="mb-6">
+          <label className="block text-grey-darker text-sm font-bold mb-2">
+            Item Category
+          </label>
+          <select onChange={handleItemCategoryChange}>
+            <option disabled> -- Select category that best fits your item -- </option>
+            {
+              itemCategory.map((item) => <option value={item.label}>{item.value}</option>)
+            }
+          </select>
+        </div>
         <button
             className="bg-blue-500 hover:bg-blue-dark text-white font-bold py-2 px-4 rounded"
             type="submit">
