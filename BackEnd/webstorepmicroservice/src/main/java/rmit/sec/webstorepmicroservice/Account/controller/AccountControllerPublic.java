@@ -89,7 +89,7 @@ public class AccountControllerPublic {
                 encryptionUtil.serverAESDecrypt(sessionKey, request.getNewPassword())
         );
 
-        return accountService.forgotPassword(decryptedRequest);
+        return encryptionUtil.serverAESEncrypt(sessionKey, accountService.forgotPassword(decryptedRequest));
     }
 
 }

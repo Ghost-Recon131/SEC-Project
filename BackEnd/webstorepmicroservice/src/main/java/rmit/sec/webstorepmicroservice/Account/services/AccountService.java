@@ -1,6 +1,7 @@
 package rmit.sec.webstorepmicroservice.Account.services;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +86,9 @@ public class AccountService implements UserDetailsService {
             try{
                 UUID uuid = UUID.randomUUID();
                 String hashedPassword = bCryptPasswordEncoder.encode(request.getPassword());
-                String hashedSQA = bCryptPasswordEncoder.encode(request.getSecret_question_answer());
 
+                // Cannot use bCryptPasswordEncoder here as it uses a salt that changes every time
+                String hashedSQA = DigestUtils.sha256Hex(request.getSecret_question_answer()).toLowerCase();
                 Account newUser = new Account(request.getUsername(), request.getEmail(), request.getFirstname(),
                         request.getLastname(), hashedPassword, request.getSecret_question(),
                         hashedSQA, uuid.toString(), AccountRole.USER);
@@ -112,7 +114,7 @@ public class AccountService implements UserDetailsService {
                 account = accountRepository.getAccountByUsername(request.getUsername());
 
                 boolean secretQuestionMatch = account.getSecretQuestion().equals(request.getSecret_question());
-                String hashedSecretQuestionAnswer = bCryptPasswordEncoder.encode(request.getSecret_question_answer());
+                String hashedSecretQuestionAnswer = DigestUtils.sha256Hex(request.getSecret_question_answer()).toLowerCase();
                 boolean getSecretQuestionAnswerMatch = account.getSecretQuestionAnswer().equals(hashedSecretQuestionAnswer);
 
                 if(secretQuestionMatch && getSecretQuestionAnswerMatch){
