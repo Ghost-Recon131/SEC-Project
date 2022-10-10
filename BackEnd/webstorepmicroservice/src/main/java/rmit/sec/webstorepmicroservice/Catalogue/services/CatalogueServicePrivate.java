@@ -28,6 +28,9 @@ public class CatalogueServicePrivate {
     public String listItem(Long sellerID, ItemListingRequest request, Long sessionID) {
         String result = "";
         CatalogueItem newItem = null;
+
+        // Convert the enum value
+        ItemCatagory itemCatagory = ItemCatagory.valueOf(request.getItemCategory().toUpperCase());
         try{
             newItem = new CatalogueItem(
                     sellerID,
@@ -36,8 +39,8 @@ public class CatalogueServicePrivate {
                     Boolean.FALSE,
                     request.getItemPrice(),
                     request.getItemQuantity(),
-                    null,
-                    ItemCatagory.valueOf(request.getItemCategory().toUpperCase())
+                    request.getItemImage(),
+                    itemCatagory
             );
             // Set item as available only if the specified quantity is greater than 0 or "-1" which denotes unlimited quantity
             if (request.getItemQuantity() == -1 || request.getItemQuantity() > 0) {
