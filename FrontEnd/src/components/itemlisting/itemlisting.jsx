@@ -1,9 +1,7 @@
 import { getGlobalState, setGlobalState } from "components/utils/globalState";
-import cookie from "js-cookie";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
-import { data } from "autoprefixer";
 import {
   clientAESDecrypt,
   clientAESEncrypt,
@@ -56,8 +54,8 @@ export default function Component() {
   }, []);
 
   // Set
-  function confirmDeleteListing() {
-    if (!token) {
+  function confirmDisableListing() {
+    if (token) {
       const confirm = true;
       setConfirmDelete(confirm);
     } else {
@@ -65,24 +63,35 @@ export default function Component() {
     }
   }
 
-  // TODO: Fix here
   // Function to disable a listing
-  async function deleteListing() {
-    const data = {
-      itemID: clientAESEncrypt(itemID),
-      sellerID: "",
-      category: "",
-    };
+  async function disableListing() {
+    try{
+      const data = {
+        itemID: clientAESEncrypt(itemID),
+        sellerID: "",
+        category: "",
+      };
 
-    let response = await axios.post(
-      getGlobalState("backendDomain") +
-        "/api/authorised/catalogue/?sessionID=" +
-        sessionID,
-      data
-    );
+      let response = await axios.post(
+          getGlobalState("backendDomain") +
+          "/api/authorised/catalogue/endListing?sessionID=" +
+          sessionID,
+          data,
+          {headers: {Authorization: token}}
+      );
 
-    // Go back to home after delete
-    // navigate("/");
+      response = clientAESDecrypt(response.data);
+
+      // Go back to home after delete
+      if(response === "Successfully disabled item listing"){
+        setError("");
+        navigate("/");
+      }else{
+        setError(response);
+      }
+    }catch (e) {
+      setError("Exception occurred");
+    }
   }
 
   return (
@@ -96,22 +105,23 @@ export default function Component() {
         <p className="mb-4">Category: {product.itemCategory}</p>
         <p className="mb-4">Description: {product.itemDescription}</p>
         <p className="mb-4">Price: ${product.itemPrice}</p>
-        <p className="mb-4">Remaning stock: {product.itemQuantity}</p>
+        <p className="mb-4">Item Available: {product.itemAvailable}</p>
+        <p className="mb-4">Remaining stock: {product.itemQuantity}</p>
         {/*If: logged-in user == creator of item listing, show below*/}
         {userID === product.sellerID ? (
           <div>
             <button
               className="text-yellow-400 mb-4"
-              onClick={() => navigate("/editListing?id=" + product.id)}
+              onClick={() => navigate("/editListing?itemID=" + product.itemID)}
             >
               Edit Listing
             </button>
             <br></br>
             <button
               className="text-red-600 font-bold"
-              onClick={() => confirmDeleteListing()}
+              onClick={() => confirmDisableListing()}
             >
-              Disable Listing
+              Disable Listing (WARNING THIS PROCESS IS IRREVERSIBLE)
             </button>
 
             {/* If: logged-in user == creator of item listing and confirmed to delete account */}
@@ -119,10 +129,10 @@ export default function Component() {
               <div>
                 <button
                   className="text-red-600 font-bold"
-                  onClick={() => deleteListing()}
-                >
+                  onClick={() => disableListing()}>
                   CONFIRM DISABLE
                 </button>
+                <p>{error}</p>
               </div>
             ) : (
               <div className="text-yellow-500 font-bold"></div>
