@@ -86,7 +86,8 @@ public class CatalogueServicePrivate {
                     toEdit.setItemQuantity(request.getItemQuantity());
                 }
                 if(request.getItemCategory() != null){
-                    toEdit.setItemCategory(ItemCatagory.valueOf(request.getItemCategory().toUpperCase()));
+                    ItemCatagory itemCatagory = ItemCatagory.valueOf(request.getItemCategory().toUpperCase());
+                    toEdit.setItemCategory(itemCatagory);
                 }
                 if(request.getItemImage() != null){
                     toEdit.setItemImage(request.getItemImage());
