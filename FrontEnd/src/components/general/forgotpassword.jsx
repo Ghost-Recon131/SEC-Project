@@ -1,4 +1,4 @@
-import { getGlobalState, setGlobalState } from "components/utils/globalState";
+import { getGlobalState} from "components/utils/globalState";
 import axios from "axios";
 import { useState } from "react";
 import {useNavigate,} from 'react-router-dom';
@@ -34,13 +34,13 @@ export default function Component() {
                     "newPassword": clientAESEncrypt(newPassword)
                 }
                 const sessionID = localStorage.getItem('sessionID');
-                var res = await axios.post(getGlobalState("backendDomain")+"/api/authorised/viewAccountInfo?sessionID=" + sessionID, data);
+                var res = await axios.post(getGlobalState("backendDomain")+"/api/RegisterLogin/forgotPassword?sessionID=" + sessionID, data);
 
                 // Check response from server, then redirect to log in on success or display error on failure
                 res = clientAESDecrypt(res.data);
                 if(res === "Password successfully changed") {
                     setError("Password reset successfully");
-                    navigate("/login");
+                    navigate("/signin");
                 }else{
                     setError(res);
                 }
