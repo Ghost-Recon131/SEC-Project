@@ -10,7 +10,7 @@ async function keyExchange(){
 
     // Generate random secret
     const secretKey = secretKeyGenerator()
-    sessionStorage.setItem('secretKey', secretKey)
+    localStorage.setItem('secretKey', secretKey)
 
     // Perform RSA encryption
     const rsa = new JSEncrypt();
@@ -25,7 +25,7 @@ async function keyExchange(){
 
     // Check response from backend, if we have a JWT token, then save it, otherwise throw an error
     if (sessionID){
-        sessionStorage.setItem('sessionID', sessionID)
+        localStorage.setItem('sessionID', sessionID)
     }else{
         console.error("key exchange failed")
     }

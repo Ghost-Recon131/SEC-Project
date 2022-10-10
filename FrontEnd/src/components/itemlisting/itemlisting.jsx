@@ -11,9 +11,9 @@ import {
 
 export default function Component() {
   const navigate = useNavigate();
-  const token = sessionStorage.getItem("jwt-token");
-  const sessionID = sessionStorage.getItem("sessionID");
-  const userID = sessionStorage.getItem("userID");
+  const token = localStorage.getItem("jwt-token");
+  const sessionID = localStorage.getItem("sessionID");
+  const userID = localStorage.getItem("userID");
 
   var [product, setProduct] = useState({});
   var [images, setImages] = useState([]);
@@ -97,42 +97,41 @@ export default function Component() {
         <p className="mb-4">Description: {product.itemDescription}</p>
         <p className="mb-4">Price: ${product.itemPrice}</p>
         <p className="mb-4">Remaning stock: {product.itemQuantity}</p>
+        {/*If: logged-in user == creator of item listing, show below*/}
+        {userID === product.sellerID ? (
+          <div>
+            <button
+              className="text-yellow-400 mb-4"
+              onClick={() => navigate("/editListing?id=" + product.id)}
+            >
+              Edit Listing
+            </button>
+            <br></br>
+            <button
+              className="text-red-600 font-bold"
+              onClick={() => confirmDeleteListing()}
+            >
+              Disable Listing
+            </button>
+
+            {/* If: logged-in user == creator of item listing and confirmed to delete account */}
+            {confirmDelete === true ? (
+              <div>
+                <button
+                  className="text-red-600 font-bold"
+                  onClick={() => deleteListing()}
+                >
+                  CONFIRM DISABLE
+                </button>
+              </div>
+            ) : (
+              <div className="text-yellow-500 font-bold"></div>
+            )}
+          </div>
+        ) : (
+          <div className="text-yellow-500 font-bold"></div>
+        )}
       </div>
-
-      {/*If: logged-in user == creator of item listing, show below*/}
-      {userID === product.sellerID ? (
-        <div>
-          <button
-            className="text-yellow-400"
-            onClick={() => navigate("/editListing?id=" + product.id)}
-          >
-            Edit Listing
-          </button>
-          <br></br>
-          <button
-            className="text-red-600 font-bold"
-            onClick={() => confirmDeleteListing()}
-          >
-            Disable Listing
-          </button>
-
-          {/* If: logged-in user == creator of item listing and confirmed to delete account */}
-          {confirmDelete === true ? (
-            <div>
-              <button
-                className="text-red-600 font-bold"
-                onClick={() => deleteListing()}
-              >
-                CONFIRM DISABLE
-              </button>
-            </div>
-          ) : (
-            <div className="text-yellow-500 font-bold"></div>
-          )}
-        </div>
-      ) : (
-        <div className="text-yellow-500 font-bold"></div>
-      )}
     </div>
   );
 }

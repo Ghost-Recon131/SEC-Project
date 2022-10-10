@@ -3,7 +3,10 @@ import axios from "axios";
 import { useState } from "react";
 import cookie from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import {clientAESDecrypt, clientAESEncrypt} from "../security/EncryptionUtils";
+import {
+  clientAESDecrypt,
+  clientAESEncrypt,
+} from "../security/EncryptionUtils";
 
 export default function Component() {
   var [formData, setFormData] = useState({ username: "", password: "" });
@@ -14,37 +17,53 @@ export default function Component() {
   function formInputs(event) {
     event.preventDefault();
     var { name, value } = event.target;
-    setFormData({ ...formData, [name]: value});
+    setFormData({ ...formData, [name]: value });
   }
 
   async function formSubmit(event) {
     event.preventDefault();
-    const sessionID = sessionStorage.getItem('sessionID');
+    const sessionID = localStorage.getItem("sessionID");
 
     // Encrypt our data
     const data = {
-        "username": clientAESEncrypt(username),
-        "password": clientAESEncrypt(password),
-    }
+      username: clientAESEncrypt(username),
+      password: clientAESEncrypt(password),
+    };
 
     // Post login info to backend
-    try{
-      const res = await axios.post(getGlobalState("backendDomain") + "/api/RegisterLogin/login?sessionID=" + sessionID, data);
+    try {
+      const res = await axios.post(
+        getGlobalState("backendDomain") +
+          "/api/RegisterLogin/login?sessionID=" +
+          sessionID,
+        data
+      );
       const token = res.data.token;
       // Set the JWT token in session storage, then take user back to home
-      if(token.startsWith("Bearer ")){
-        sessionStorage.setItem('jwt-token', token)
+      if (token.startsWith("Bearer ")) {
+        localStorage.setItem("jwt-token", token);
 
         // Get the user's account info using JWT token
-        const getUserDetails = await axios.get(getGlobalState("backendDomain") + "/api/authorised/viewAccountInfo?sessionID=" + sessionID, {headers: {Authorization: token}});
-        let encryptedUserDetails = getUserDetails.data
-        sessionStorage.setItem("user", clientAESDecrypt(encryptedUserDetails.email))
-        sessionStorage.setItem("userID", clientAESDecrypt(encryptedUserDetails.id))
+        const getUserDetails = await axios.get(
+          getGlobalState("backendDomain") +
+            "/api/authorised/viewAccountInfo?sessionID=" +
+            sessionID,
+          { headers: { Authorization: token } }
+        );
+        let encryptedUserDetails = getUserDetails.data;
+        localStorage.setItem(
+          "user",
+          clientAESDecrypt(encryptedUserDetails.email)
+        );
+        localStorage.setItem(
+          "userID",
+          clientAESDecrypt(encryptedUserDetails.id)
+        );
         // Take user back to home after successful login
-        navigate("/")
+        navigate("/");
         setError("");
       }
-    }catch(e){
+    } catch (e) {
       // Will throw exception if login is invalid
       setError("Invalid credentials");
     }
@@ -53,7 +72,7 @@ export default function Component() {
   return (
     <form
       onSubmit={formSubmit}
-      className="bg-white text-black shadow-md rounded px-96 pt-6 pb-8 mb-4 flex flex-col"
+      className="bg-white text-black shadow-md rounded mx-96 px-40 pt-6 pb-8 mb-4 flex flex-col"
     >
       <h1 className="text-3xl font-bold mb-10">Sign in</h1>
       <div className="mb-4">
@@ -92,6 +111,12 @@ export default function Component() {
           Sign In
         </button>
       </div>
+      <a
+        href="/forgotpassword"
+        className="mt-4 text-lg no-underline text-grey-darkest hover:text-blue-dark"
+      >
+        Forgot Password
+      </a>
       <h1 className="mt-5 text-red-500">{error}</h1>
     </form>
   );

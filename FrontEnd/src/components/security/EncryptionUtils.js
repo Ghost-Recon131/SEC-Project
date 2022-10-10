@@ -3,7 +3,7 @@ import CryptoJS from "crypto-js";
 // Encrypt data
 export function clientAESEncrypt(plainText){
     // Calculate IV based off secret key then convert the secret key to base 64
-    var secretKey = sessionStorage.getItem('secretKey')
+    var secretKey = localStorage.getItem('secretKey')
     var iv = CryptoJS.MD5(secretKey)
     secretKey = CryptoJS.enc.Base64.parse(secretKey)
 
@@ -21,7 +21,7 @@ export function clientAESEncrypt(plainText){
 // Decrypt data
 export function clientAESDecrypt(cipherText){
     // Calculate IV based off secret key then convert the secret key to base 64
-    var secretKey = sessionStorage.getItem('secretKey')
+    var secretKey = localStorage.getItem('secretKey')
     var iv = CryptoJS.MD5(secretKey)
     secretKey = CryptoJS.enc.Base64.parse(secretKey)
 

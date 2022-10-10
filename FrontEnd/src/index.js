@@ -14,14 +14,13 @@ import ModifyAccountInfo from "components/general/modifyaccountinfo";
 import ViewAccountInfo from "components/general/viewaccountinfo";
 import EditListing from "components/itemlisting/editlisting";
 import ViewTransactions from "components/transaction/viewtransactions"
-import TransactionFail from "components/transaction/transactionfail"
-import TransactionSuccess from "components/transaction/transactionsuccess"
+import Cart from "components/transaction/cart";
 
 
 createRoot(
   document.getElementById("root")
 ).render(
-  <div className="bg-black text-white px-10 pb-80">
+  <div className="bg-black text-white px-20 pb-80">
     <BrowserRouter>
       <NavBar />
       <Routes>
@@ -35,8 +34,7 @@ createRoot(
         <Route path="/viewaccountinfo" element={<ViewAccountInfo />} />
         <Route path="/editlisting" element={<EditListing />} />
         <Route path="/viewtransactions" element={<ViewTransactions />} />
-        <Route path="/transactionfail" element={<TransactionFail />} />
-        <Route path="/transactionsuccess" element={<TransactionSuccess />} />
+        <Route path="/cart" element={<Cart />} />
       </Routes>
       <Footer />
     </BrowserRouter>

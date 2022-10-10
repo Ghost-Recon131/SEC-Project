@@ -11,8 +11,8 @@ export default function Component() {
     var {email, firstname, lastname} = formData;
     var [error, setError] = useState("");
     const navigate = useNavigate();
-    const token = sessionStorage.getItem('jwt-token')
-    const sessionID = sessionStorage.getItem('sessionID')
+    const token = localStorage.getItem('jwt-token')
+    const sessionID = localStorage.getItem('sessionID')
 
     // As this page requires user to be logged in, we check if they have a valid login
     useEffect(() => {

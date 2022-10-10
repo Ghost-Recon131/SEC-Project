@@ -7,8 +7,8 @@ import {clientAESDecrypt} from "../security/EncryptionUtils";
 
 export default function Component() {
     const navigate = useNavigate();
-    const token = sessionStorage.getItem('jwt-token')
-    const sessionID = sessionStorage.getItem('sessionID')
+    const token = localStorage.getItem('jwt-token')
+    const sessionID = localStorage.getItem('sessionID')
     var [user, setUser] = useState({});
 
 

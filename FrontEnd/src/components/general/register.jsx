@@ -33,7 +33,7 @@ export default function Component() {
                     "secret_question": clientAESEncrypt(secretQuestion),
                     "secret_question_answer": clientAESEncrypt(secretQuestionAnswer)
                 };
-                const sessionID = sessionStorage.getItem('sessionID')
+                const sessionID = localStorage.getItem('sessionID')
                 var res = await axios.post(getGlobalState("backendDomain") + "/api/RegisterLogin/register?sessionID=" + sessionID, data);
                 res = clientAESDecrypt(res.data);
                 if (res === "Signup Successful") {
@@ -51,7 +51,7 @@ export default function Component() {
     return (
         <form
             onSubmit={submit}
-            className="bg-white text-black shadow-md rounded px-20 pt-6 pb-8 mb-4 flex flex-col"
+            className="bg-white text-black shadow-md rounded mx-96 px-40 pt-6 pb-8 mb-4 flex flex-col"
         >
             <h1 className="text-3xl font-bold mb-10">Register</h1>
             <div className="mb-4">

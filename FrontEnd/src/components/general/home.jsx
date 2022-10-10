@@ -11,13 +11,13 @@ export default function Component() {
   const space = " ";
 
   useEffect(() => {
-    if (!sessionStorage.getItem("sessionID")) {
+    if (!localStorage.getItem("sessionID")) {
       keyExchange().then((r) => window.location.reload());
       // window.location.reload()
       console.log("key exchange");
     } else {
       // Get our session ID
-      const sessionID = sessionStorage.getItem("sessionID");
+      const sessionID = localStorage.getItem("sessionID");
 
       // Get encrypted data from backend, then decrypt it
       async function axiosPost() {
@@ -48,9 +48,6 @@ export default function Component() {
   // Display our products
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white shadow-md rounded pt-2 pb-8 mb-4">
-        Item Listings
-      </h1>
       <div className="flex flex-wrap text-white">
         {items.map((item) => (
           <Product item={item} key={item.itemID} />

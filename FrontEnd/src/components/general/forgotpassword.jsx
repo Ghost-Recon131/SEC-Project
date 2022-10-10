@@ -33,7 +33,7 @@ export default function Component() {
                     "secret_question_answer": clientAESEncrypt(secretQuestionAnswer),
                     "newPassword": clientAESEncrypt(newPassword)
                 }
-                const sessionID = sessionStorage.getItem('sessionID');
+                const sessionID = localStorage.getItem('sessionID');
                 var res = await axios.post(getGlobalState("backendDomain")+"/api/authorised/viewAccountInfo?sessionID=" + sessionID, data);
 
                 // Check response from server, then redirect to log in on success or display error on failure
@@ -86,7 +86,7 @@ export default function Component() {
             </div>
             <div className="mb-6">
                 <label className="block text-grey-darker text-sm font-bold mb-2">
-                secretQuestionAnswer
+                Secret Question Answer
                 </label>
                 <input
                     value={secretQuestionAnswer}
@@ -100,7 +100,7 @@ export default function Component() {
             </div>
             <div className="mb-6">
                 <label className="block text-grey-darker text-sm font-bold mb-2">
-                    newPassword
+                    New Password
                 </label>
                 <input
                     value={newPassword}
@@ -114,7 +114,7 @@ export default function Component() {
             </div>
             <div className="mb-6">
                 <label className="block text-grey-darker text-sm font-bold mb-2">
-                    confirmNewPassword
+                    Confirm New Password
                 </label>
                 <input
                     value={confirmNewPassword}
