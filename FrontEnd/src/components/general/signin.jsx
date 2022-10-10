@@ -39,6 +39,7 @@ export default function Component() {
         const getUserDetails = await axios.get(getGlobalState("backendDomain") + "/api/authorised/viewAccountInfo?sessionID=" + sessionID, {headers: {Authorization: token}});
         let encryptedUserDetails = getUserDetails.data
         sessionStorage.setItem("user", clientAESDecrypt(encryptedUserDetails.email))
+        sessionStorage.setItem("userID", clientAESDecrypt(encryptedUserDetails.id))
         // Take user back to home after successful login
         navigate("/")
         setError("");
