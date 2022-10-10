@@ -27,9 +27,12 @@ export default function Component() {
                 currentUserDetails = currentUserDetails.data
                 // Decrypt the data and prefill current values
                 if(currentUserDetails){
-                    email = clientAESDecrypt(currentUserDetails.email)
-                    firstname = clientAESDecrypt(currentUserDetails.firstname)
-                    lastname = clientAESDecrypt(currentUserDetails.lastname)
+                    const decrypted = {
+                        "email": clientAESDecrypt(currentUserDetails.email),
+                        "firstname": clientAESDecrypt(currentUserDetails.firstname),
+                        "lastname": clientAESDecrypt(currentUserDetails.lastname),
+                    }
+                    setFormData(decrypted);
                 }
             }
             try{
@@ -65,7 +68,7 @@ export default function Component() {
             // If successful, reload the page with current details, otherwise display error
             if(res === "Account details updated successfully!"){
                 setError("")
-                window.location.reload()
+                navigate("/viewaccountinfo")
             }else{
                 setError(res);
             }
@@ -86,7 +89,7 @@ export default function Component() {
                 </label>
                 <input
                     value={email}
-                    name="address"
+                    name="email"
                     onChange={formInputs}
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
                     type="text"

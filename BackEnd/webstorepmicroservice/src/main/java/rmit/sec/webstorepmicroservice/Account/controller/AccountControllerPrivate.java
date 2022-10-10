@@ -51,6 +51,8 @@ public class AccountControllerPrivate {
     public String changePassword(HttpServletRequest request, @RequestParam Long sessionID, @RequestBody ChangePasswordRequest changePasswordRequest) {
         Long userID = jwtUtil.getUserIdByJWT(request).getId();
 
+        // Decrypt incoming data
+        changePasswordRequest.setPassword(sessionKeyService.aesDecryptMessage(sessionID, changePasswordRequest.getPassword()));
         String response = accountServiceAuthorised.changePassword(userID, changePasswordRequest);
         return sessionKeyService.aesEncryptMessage(sessionID, response);
     }
@@ -59,6 +61,13 @@ public class AccountControllerPrivate {
     @PutMapping(path = "/updateAccountInfo")
     public String updateAccountInfo(HttpServletRequest request, @RequestParam Long sessionID, @RequestBody UpdateAccountInfoRequest updateInfoRequest) {
         Long userID = jwtUtil.getUserIdByJWT(request).getId();
+
+        // Decrypt the data
+        String sessionKey = sessionKeyService.getAESKey(sessionID);
+        updateInfoRequest.setEmail(encryptionUtil.serverAESDecrypt(sessionKey, updateInfoRequest.getEmail()));
+        updateInfoRequest.setFirstname(encryptionUtil.serverAESDecrypt(sessionKey, updateInfoRequest.getFirstname()));
+        updateInfoRequest.setLastname(encryptionUtil.serverAESDecrypt(sessionKey, updateInfoRequest.getLastname()));
+
         String response = accountServiceAuthorised.updateAccount(userID, updateInfoRequest);
         return sessionKeyService.aesEncryptMessage(sessionID, response);
     }

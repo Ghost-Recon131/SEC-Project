@@ -46,13 +46,20 @@ export default function Component() {
 
     return (
         <div>
-            <h3 className="text-2xl font-bold text-white shadow-md rounded pt-2 pb-8 mb-4">Account Info</h3>
-            <p>Account ID: {user.id}</p>
-            <p>Username: {user.username}</p>
-            <p>Email: {user.email}</p>
-            <p>First Name: {user.firstname}</p>
-            <p>Last Name: {user.lastname}</p>
-            <p>Secret question: {user.secretQuestion}</p>
+            <h1 className="text-2xl mb-8">Account Info</h1>
+            <p className="mb-4">Account ID: {user.id}</p>
+            <p className="mb-4">Username: {user.username}</p>
+            <p className="mb-4">Email: {user.email}</p>
+            <p className="mb-4">First Name: {user.firstname}</p>
+            <p className="mb-4">Last Name: {user.lastname}</p>
+            <p className="mb-4">Secret question: {user.secretQuestion}</p>
+            <div>
+            <button className="mb-4"
+                className="text-yellow-400 mb-4"
+                onClick={() => navigate("/modifyaccountinfo")}>
+                Edit Account Details
+            </button>
+            </div>
         </div>
     );
 }
