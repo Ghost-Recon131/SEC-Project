@@ -76,12 +76,9 @@ export function removeItemsFromCart(item){
     const userCart = localStorage.getItem("cart");
     const cartItems = JSON.parse(userCart);
 
-    // Set the item that the user selected
-    const itemSelected = {"itemID": item.itemID, "quantity": 1};
-
     // Add the other items that the user didn't want to remove to the cart array
     cartItems.forEach((cartItem) => {
-        if (cartItem.itemID !== itemSelected.itemID){
+        if (cartItem.itemID !== item){
             cart.push(cartItem);
         }
     });
