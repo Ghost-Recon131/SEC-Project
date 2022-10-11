@@ -57,7 +57,7 @@ public class TransactionService {
     public String saveTransaction(TransactionRequest request){
         String result = "";
         try{
-            Transactions transaction = new Transactions(request.getBuyerID(), request.getSellerID(), request.getTotalCost());
+            Transactions transaction = new Transactions(request.getItemID(), request.getBuyerID(), request.getSellerID(), request.getTotalCost());
             transactionRepository.save(transaction);
             result = "Transaction saved successfully";
         }catch (Exception e){
@@ -76,9 +76,11 @@ public class TransactionService {
             for (Transactions transaction : transactionsList) {
                 EncryptedTransaction encryptedTransaction = new EncryptedTransaction(
                         encryptionUtil.serverAESEncrypt(sessionKey, transaction.getTransactionID().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, transaction.getItemID().toString()),
                         encryptionUtil.serverAESEncrypt(sessionKey, transaction.getBuyerID().toString()),
                         encryptionUtil.serverAESEncrypt(sessionKey, transaction.getSellerID().toString()),
-                        encryptionUtil.serverAESEncrypt(sessionKey, transaction.getTotalCost().toString())
+                        encryptionUtil.serverAESEncrypt(sessionKey, transaction.getTotalCost().toString()),
+                        encryptionUtil.serverAESEncrypt(sessionKey, transaction.getCreate_At().toString())
                 );
                 encryptedTransactions.add(encryptedTransaction);
             }

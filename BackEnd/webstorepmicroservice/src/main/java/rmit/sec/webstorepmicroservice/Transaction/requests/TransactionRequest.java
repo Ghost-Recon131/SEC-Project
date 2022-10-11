@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class TransactionRequest {
+    private Long itemID;
     private Long sellerID;
     private Long buyerID;
     private Double totalCost;

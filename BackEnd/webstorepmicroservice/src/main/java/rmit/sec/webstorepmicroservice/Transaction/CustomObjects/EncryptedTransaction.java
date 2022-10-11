@@ -9,7 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EncryptedTransaction {
     private String transactionID;
+    private String itemID;
     private String sellerID;
     private String buyerID;
     private String totalCost;
+    private String transactionDate;
 }

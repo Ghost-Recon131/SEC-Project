@@ -19,6 +19,9 @@ public class Transactions {
     @Column(name = "transaction_id")
     private Long transactionID;
 
+    @Column(name = "item_id")
+    private Long itemID;
+
     @Column(name = "seller_id")
     private Long sellerID;
 
@@ -31,7 +34,8 @@ public class Transactions {
     @Column(name = "create_At")
     private Date create_At = new Date();
 
-    public Transactions(Long sellerID, Long buyerID, Double totalCost) {
+    public Transactions(Long itemID, Long sellerID, Long buyerID, Double totalCost) {
+        this.itemID = itemID;
         this.sellerID = sellerID;
         this.buyerID = buyerID;
         this.totalCost = totalCost;
