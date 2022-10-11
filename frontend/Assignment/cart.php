@@ -63,14 +63,31 @@ print  "<li><a href=logout.php>Logout</a></li>";
          </tr>
         </thead>
             <tbody>
-                <tr>
-                    <td><a href="#"><i class="fa-solid fa-x"></i></a></td>
-                    <td> <img src="tut/img/products/f1.jpg"></td>
-                    <td>Nike SB</td>
-                    <td>$118.19</td>
-                    <td><input type="number" value="1"></td>
-                    <td>$118.19</td>
-                </tr>
+                
+                <?php
+   
+
+   $db = mysqli_connect("localhost", "root", "","ecommerce" );
+$wherein = implode(',',$_SESSION['cart']);
+
+    $q = "select * from products where product_id in ($wherein)";
+
+    $result = mysqli_query ($db, $q) or die (mysqli_error($db));
+
+    while ($row = mysqli_fetch_array($result))
+        {
+            print "<tr>";
+            print "<td><a href=><i class= \"fa-solid fa-x\"></i></a></td>";
+            print "<td> <img src='{$row['ProductImage']}'></td>";
+            print "<td>{$row['productName']}</td>";
+            print "<td>{$row['productPrice']}</td>";
+            print "<td><input type=number value=1></td>";
+            print "<td>{$row['productPrice']}</td>";
+            print "</tr>";
+        }
+        ?>
+                
+                
             </tbody>
     </table>
 </section>
@@ -167,5 +184,7 @@ print  "<li><a href=logout.php>Logout</a></li>";
         <p>&copy; 2022, The Boys </p>
     </div>
 
+
 </footer>
 </html>
+

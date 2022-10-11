@@ -55,7 +55,7 @@ print  "<li><a href=logout.php>Logout</a></li>";
     <p>Welcome back you've <br> been missed!</p>
     <form method="post" action="process_login.php">
       <input type="text" placeholder="Enter username" name="username">
-      <input type="password" placeholder="Password" name="password">
+      <input type="password" placeholder="Password" name="password" id="password">
       <p class="recover">
         <a href="#">Recover Password</a>
       </p>
@@ -131,6 +131,7 @@ print  "<li><a href=logout.php>Logout</a></li>";
   </div>
 
 
+</script>
 
 </footer>
 </body>

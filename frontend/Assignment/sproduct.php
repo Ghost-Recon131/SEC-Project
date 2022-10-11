@@ -43,41 +43,58 @@ print  "<li><a href=logout.php>Logout</a></li>";
 </section>
 
 <section id="prodetails" class="section-p1">
-    <div class="single-pro-image">
-        <img src="tut/img/products/f1.jpg" width="100%" id="MainImg">
+    
+<?php
+   
 
-        <div class="small-img-group">
-            <div class="small-img-col">
-                <img src="tut/img/products/f1.jpg" width="100%" class="small-img">
-            </div>
-            <div class="small-img-col">
-                <img src="tut/img/products/f2.jpg" width="100%" class="small-img">
-            </div>
-            <div class="small-img-col">
-                <img src="tut/img/products/f3.jpg" width="100%" class="small-img">
-            </div>
-            <div class="small-img-col">
-                <img src="tut/img/products/f4.jpg" width="100%" class="small-img">
-            </div>
-        </div>
-    </div>
+   $db = mysqli_connect("localhost", "root", "","ecommerce" );
+$wherein = implode(',',$_SESSION['single']);
+$end = end($_SESSION['single']);
 
-    <div class="single-pro-details">
-        <h6>Home / T-shirt</h6>
-        <h4>Men's Fashion T Shirt</h4>
-        <h2>$139.00</h2>
-        <select>
-            <option>Select Size</option>
-            <option>XXL</option>
-            <option>XL</option>
-            <option>Large</option>
-            <option>Small</option>
-        </select>
-        <input type="number"value="1">
-        <button class="normal">Add to Cart</button>
-        <h4>Product Details</h4>
-        <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean lacus massa, egestas eu sem non, molestie consequat metus. In hac habitasse platea dictumst. Curabitur nisl magna, pharetra sit amet ex quis, dictum aliquet neque. Mauris eget sodales sapien, sit amet interdum diam. Nulla accumsan lobortis nibh in sagittis. Praesent magna libero, hendrerit in felis id, molestie finibus justo. Pellentesque enim turpis, tempus vitae molestie eu, ullamcorper non urna. Nullam faucibus feugiat massa, ut dapibus justo viverra quis. Vestibulum at congue quam.</span>
-    </div>
+
+
+    $q = "select * from products where product_id in ($end)";
+
+    $result = mysqli_query ($db, $q) or die (mysqli_error($db));
+
+    while ($row = mysqli_fetch_array($result))
+        {
+            print "<div class=\"single-pro-image\">";
+            print "<img src='{$row['ProductImage']}' width=100% id=MainImg>";
+    
+           print "<div class=\"small-img-group\">";
+                print "<div class=\"small-img-col\">";
+                    print "<img src='{$row['ProductImage']}' width=100% class=\"small-img\">";
+                print "</div>";
+                print "<div class=\"small-img-col\">";
+                print "<img src='{$row['ProductImage']}'width=100% class=\"small-img\">";
+            print "</div>";
+            print "<div class=\"small-img-col\">";
+            print "<img src='{$row['ProductImage']}' width=100% class=\"small-img\">";
+        print "</div>";
+        print "<div class=\"small-img-col\">";
+        print "<img src='{$row['ProductImage']}' width=100% class=\"small-img\">";
+    print "</div>";
+            print "</div>";
+        print "</div>";
+    
+   print     "<div class=\"single-pro-details\">";
+         print    "<h4>{$row['productName']}</h4>";
+            print "<h2>{$row['productPrice']}</h2>";
+            print "<select>";
+                print "<option>Select Size</option>";
+                print "<option>XXL</option>";
+                print "<option>XL</option>";
+                print "<option>Large</option>";
+                print "<option>Small</option>";
+            print "</select>";
+            print "<input type=number value=1>";
+            print "<button class=\"normal\">Add to Cart</button>";
+            print "<h4>Product Details</h4>";
+            print "<span>{$row['productDescription']}</span>";
+        print "</div>";
+        }
+        ?>
 </section>
 
 <section id="product1" class="section-p1">
@@ -242,3 +259,13 @@ print  "<li><a href=logout.php>Logout</a></li>";
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
