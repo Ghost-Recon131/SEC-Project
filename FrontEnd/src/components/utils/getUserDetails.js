@@ -2,6 +2,7 @@ import axios from "axios";
 import {getGlobalState} from "./globalState";
 import {clientAESDecrypt} from "../security/EncryptionUtils";
 
+// Utility function to get user details from the server
 export async function getUserDetails() {
     const sessionID = localStorage.getItem("sessionID");
     const token = localStorage.getItem("jwt-token");
@@ -20,6 +21,7 @@ export async function getUserDetails() {
         "lastname": clientAESDecrypt(encryptedUserDetails.lastname),
         "secretQuestion": clientAESDecrypt(encryptedUserDetails.secretQuestion),
     }
+    // Need to return a string otherwise React is unable to get the object
     return JSON.stringify(user);
 }
 

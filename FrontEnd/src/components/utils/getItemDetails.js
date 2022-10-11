@@ -2,6 +2,7 @@ import {clientAESDecrypt, clientAESEncrypt} from "../security/EncryptionUtils";
 import axios from "axios";
 import {getGlobalState} from "./globalState";
 
+// Utility function to get item details from the server
 export async function getItemDetails(itemID) {
     const sessionID = localStorage.getItem("sessionID");
 
@@ -26,7 +27,7 @@ export async function getItemDetails(itemID) {
         itemImage: clientAESDecrypt(item.itemImage),
         itemCategory: clientAESDecrypt(item.itemCategory),
     };
-    // console.log("decryptedItem: ", JSON.stringify(decryptedItem));
 
+    // Need to return a string otherwise React is unable to get the object
     return JSON.stringify(decryptedItem);
 }
