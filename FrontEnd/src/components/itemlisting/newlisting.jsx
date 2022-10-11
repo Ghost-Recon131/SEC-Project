@@ -44,7 +44,6 @@ export default function Component() {
   ]
 
   let handleItemCategoryChange = (e) => {
-    console.log(e.target.value)
     setFormData({...formData, category: e.target.value});
   }
 
