@@ -6,7 +6,7 @@ All endpoints in this class requires a valid JWT token.
 
 ## Get a transaction by transaction ID
 * Request Method: GET
-* Endpoint URI: /api/transactions/getTransactionByID
+* Endpoint URI: /api/authorised/transactions/getTransactionByID
 * Requires param of "sessionID" ie: URI+?sessionID=3
 ```json
 {
@@ -27,21 +27,23 @@ All endpoints in this class requires a valid JWT token.
 
 ## Get all sales for a user
 * Request Method: GET
-* Endpoint URI: /api/transactions/getAllSales
+* Endpoint URI: /api/authorised/transactions/getAllSales
 * Requires param of "sessionID" ie: URI+?sessionID=3
 * Returns arraylist of encrypted JSON objects
 
 
 ## Save a transaction
 * Request Method: POST
-* Endpoint URI: /api/transactions/saveTransaction
+* Endpoint URI: /api/authorised/transactions/saveTransaction
 * Requires param of "sessionID" ie: URI+?sessionID=3
 ```json
 {
-    "transactionID": "NULL OR PLACEHOLDER VALUE",
-    "sellerID": 1,
-    "buyerID": 1,
-    "totalCost": 11.11
+  "transactionID": "CAN BE NULL",
+  "itemID": "PASS THE ITEM ID OF THE ITEM BEING PURCHASED",
+  "sellerID": 1,
+  "buyerID": "CAN BE NULL",
+  "totalCost": 11.11, 
+  "transactionDate": "LEAVE AS NULL"
 }
 ```
 * Returns encrypted string for result
