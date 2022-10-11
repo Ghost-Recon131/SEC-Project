@@ -29,29 +29,33 @@ public class CatalogueServicePrivate {
         String result = "";
         CatalogueItem newItem = null;
 
-        // Convert the enum value
-        ItemCatagory itemCatagory = ItemCatagory.valueOf(request.getItemCategory().toUpperCase());
-        try{
-            newItem = new CatalogueItem(
-                    sellerID,
-                    request.getItemName(),
-                    request.getItemDescription(),
-                    Boolean.FALSE,
-                    request.getItemPrice(),
-                    request.getItemQuantity(),
-                    request.getItemImage(),
-                    itemCatagory
-            );
-            // Set item as available only if the specified quantity is greater than 0 or "-1" which denotes unlimited quantity
-            if (request.getItemQuantity() == -1 || request.getItemQuantity() > 0) {
-                newItem.setItemAvailable(Boolean.TRUE);
+        if(request.getItemPrice() == -101.101){
+            result = "Invalid price entered, please enter a valid DOUBLE";
+        }else{
+            // Convert the enum value
+            ItemCatagory itemCatagory = ItemCatagory.valueOf(request.getItemCategory().toUpperCase());
+            try{
+                newItem = new CatalogueItem(
+                        sellerID,
+                        request.getItemName(),
+                        request.getItemDescription(),
+                        Boolean.FALSE,
+                        request.getItemPrice(),
+                        request.getItemQuantity(),
+                        request.getItemImage(),
+                        itemCatagory
+                );
+                // Set item as available only if the specified quantity is greater than 0 or "-1" which denotes unlimited quantity
+                if (request.getItemQuantity() == -1 || request.getItemQuantity() > 0) {
+                    newItem.setItemAvailable(Boolean.TRUE);
+                }
+                catalogueItemRepository.save(newItem);
+                result = "Successfully listed item";
+            }catch (Exception e){
+                result = "Failed to listed item";
+                logger.warn("Error listing new item");
+                logger.error(e.getMessage());
             }
-            catalogueItemRepository.save(newItem);
-            result = "Successfully listed item";
-        }catch (Exception e){
-            result = "Failed to listed item";
-            logger.warn("Error listing new item");
-            logger.error(e.getMessage());
         }
         return sessionKeyService.aesEncryptMessage(sessionID, result);
     }
