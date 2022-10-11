@@ -12,6 +12,7 @@ export default function Component() {
       localStorage.removeItem("jwt-token");
       localStorage.removeItem("user");
       localStorage.removeItem("userID");
+      localStorage.removeItem("cart");
       navigate("/");
     } else if (event.target.value === "newListing") {
       navigate("/newlisting");
