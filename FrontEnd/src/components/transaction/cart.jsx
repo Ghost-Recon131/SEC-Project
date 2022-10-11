@@ -11,7 +11,7 @@ export default function Example() {
   const navigate = useNavigate();
   const token = localStorage.getItem("jwt-token");
   const sessionID = localStorage.getItem("sessionID");
-  const [totalCost, setTotalCost] = useState(0);
+  const [totalCost, setTotalCost] = useState(null);
   let products = {};
   const [itemArray, setItemArray] = useState([]);
 
@@ -52,7 +52,7 @@ export default function Example() {
         cartQuantity: products[i].quantity
       }
       // Add to total cost save to array
-      tmpCost = totalCost + product.itemPrice * products[i].quantity;
+      tmpCost = tmpCost + product.itemPrice * products[i].quantity;
       productArray.push(productWithQuantity);
     }
     // Save the array and total cost to the proper react hooks
