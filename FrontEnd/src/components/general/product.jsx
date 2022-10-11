@@ -1,6 +1,12 @@
+import {addItemToCart} from "../utils/shoppingCart";
+
 export default function Component({ item }) {
+  const userID = localStorage.getItem("userID");
+
+  // Pass items we want to add to cart
   function addToCart(e) {
     e.preventDefault();
+    addItemToCart(item);
   }
 
   return (
@@ -19,12 +25,21 @@ export default function Component({ item }) {
         <p className="mb-2 font-bold tracking-tight text-gray-900 flex justify-start">
           ${item.itemPrice}
         </p>
-        <button
-          onClick={addToCart}
-          className="cursor-pointer inline-flex w-full items-center justify-center rounded-lg bg-black py-2 m font-medium text-white "
-        >
-          Add to Cart
-        </button>
+
+        {/*  Do not show the add to cart button if user is not signed in or is the owner of the item  */}
+        {(userID) && (userID !== item.sellerID) ? (
+            <button
+                onClick={addToCart}
+                className="cursor-pointer inline-flex w-full items-center justify-center rounded-lg bg-black py-2 m font-medium text-white "
+            >
+              Add to Cart
+            </button>
+            ) : (
+            <button
+                className="cursor-pointer inline-flex w-full items-center justify-center rounded-lg bg-black py-2 m font-medium text-white ">
+              View item
+            </button>
+        )}
       </div>
     </a>
   );

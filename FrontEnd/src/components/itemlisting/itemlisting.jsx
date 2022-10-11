@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import {clientAESDecrypt, clientAESEncrypt,} from "../security/EncryptionUtils";
 import {getItemDetails} from "../utils/getItemDetails";
+import {addItemToCart} from "../utils/shoppingCart";
 
 export default function Component() {
   const navigate = useNavigate();
@@ -26,7 +27,12 @@ export default function Component() {
     fetch1();
   }, []);
 
-  // Set
+  // Add item to cart
+  function addToCart(){
+    addItemToCart(product);
+  }
+
+  // Ask user to confirm disabling their listing
   function confirmDisableListing() {
     if (token) {
       const confirm = true;
@@ -80,6 +86,19 @@ export default function Component() {
         <p className="mb-4">Price: ${product.itemPrice}</p>
         <p className="mb-4">Item Available: {product.itemAvailable}</p>
         <p className="mb-4">Remaining stock: {product.itemQuantity}</p>
+
+
+        {/*  Allow user to add item to cart if they are signed in & not the seller of the item  */}
+        {(userID) && (userID !== product.sellerID) ? (
+            <button
+                onClick={addToCart}
+                className="cursor-pointer inline-flex w-full items-center justify-center rounded-lg bg-white py-2 m font-medium text-black max-w-[20rem]">
+              Add to Cart
+            </button>
+        ) : (
+            <div></div>
+        )}
+
         {/*If: logged-in user == creator of item listing, show below*/}
         {userID === product.sellerID ? (
           <div>
