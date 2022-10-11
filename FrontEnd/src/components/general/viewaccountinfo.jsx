@@ -1,9 +1,9 @@
 import { getGlobalState, setGlobalState } from "components/utils/globalState";
-import cookie from "js-cookie";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {clientAESDecrypt} from "../security/EncryptionUtils";
+import {getUserDetails} from "../utils/getUserDetails";
 
 export default function Component() {
     const navigate = useNavigate();
@@ -19,19 +19,15 @@ export default function Component() {
             console.log("no valid login detected")
         }else{
             async function getUserInfo(){
-                let currentUserDetails = await axios.get(getGlobalState("backendDomain") + "/api/authorised/viewAccountInfo?sessionID=" + sessionID,
-                    {headers: {Authorization: token}});
-
-                // Decrypt the data and set data to current user object
-                currentUserDetails = currentUserDetails.data
+                const currentUserDetails = JSON.parse(await getUserDetails());
                 if(currentUserDetails){
                     user = {
-                        "id": clientAESDecrypt(currentUserDetails.id),
-                        "username": clientAESDecrypt(currentUserDetails.username),
-                        "email": clientAESDecrypt(currentUserDetails.email),
-                        "firstname": clientAESDecrypt(currentUserDetails.firstname),
-                        "lastname": clientAESDecrypt(currentUserDetails.lastname),
-                        "secretQuestion": clientAESDecrypt(currentUserDetails.secretQuestion),
+                        "id": currentUserDetails.id,
+                        "username": currentUserDetails.username,
+                        "email": currentUserDetails.email,
+                        "firstname": currentUserDetails.firstname,
+                        "lastname": currentUserDetails.lastname,
+                        "secretQuestion": currentUserDetails.secretQuestion,
                     }
                     setUser(user);
                 }

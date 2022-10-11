@@ -3,6 +3,7 @@ import axios from "axios";
 import {useEffect, useState} from "react";
 import {useNavigate,} from 'react-router-dom';
 import {clientAESDecrypt, clientAESEncrypt} from "../security/EncryptionUtils";
+import {getUserDetails} from "../utils/getUserDetails";
 
 
 export default function Component() {
@@ -21,16 +22,13 @@ export default function Component() {
             console.log("no valid login detected")
         }else{
             async function preFillCurrentUserInfo(){
-                let currentUserDetails = await axios.get(getGlobalState("backendDomain") + "/api/authorised/viewAccountInfo?sessionID=" + sessionID,
-                    {headers: {Authorization: token}});
-
-                currentUserDetails = currentUserDetails.data
+                const currentUserDetails = JSON.parse(await getUserDetails());
                 // Decrypt the data and prefill current values
                 if(currentUserDetails){
                     const decrypted = {
-                        "email": clientAESDecrypt(currentUserDetails.email),
-                        "firstname": clientAESDecrypt(currentUserDetails.firstname),
-                        "lastname": clientAESDecrypt(currentUserDetails.lastname),
+                        "email": currentUserDetails.email,
+                        "firstname": currentUserDetails.firstname,
+                        "lastname": currentUserDetails.lastname
                     }
                     setFormData(decrypted);
                 }

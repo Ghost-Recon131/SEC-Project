@@ -2,10 +2,8 @@ import { getGlobalState, setGlobalState } from "components/utils/globalState";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
-import {
-  clientAESDecrypt,
-  clientAESEncrypt,
-} from "../security/EncryptionUtils";
+import {clientAESDecrypt, clientAESEncrypt,} from "../security/EncryptionUtils";
+import {getItemDetails} from "../utils/getItemDetails";
 
 export default function Component() {
   const navigate = useNavigate();
@@ -13,41 +11,16 @@ export default function Component() {
   const sessionID = localStorage.getItem("sessionID");
   const userID = localStorage.getItem("userID");
 
-  var [product, setProduct] = useState({});
-  var [images, setImages] = useState([]);
-  var queryParams = new URLSearchParams(window.location.search);
-  var itemID = queryParams.get("itemID");
-  var [confirmDelete, setConfirmDelete] = useState(false);
+  const [product, setProduct] = useState({});
+  const queryParams = new URLSearchParams(window.location.search);
+  const itemID = queryParams.get("itemID");
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     // Get item details
     async function fetch1() {
-      const data = {
-        itemID: clientAESEncrypt(itemID),
-        sellerID: "",
-        category: "",
-      };
-
-      let item = await axios.post(
-        getGlobalState("backendDomain") +
-          "/api/catalogue/viewItem?sessionID=" +
-          sessionID,
-        data
-      );
-      item = item.data;
-
-      const decrypted = {
-        itemID: clientAESDecrypt(item.itemID),
-        sellerID: clientAESDecrypt(item.sellerID),
-        itemName: clientAESDecrypt(item.itemName),
-        itemDescription: clientAESDecrypt(item.itemDescription),
-        itemAvailable: clientAESDecrypt(item.itemAvailable),
-        itemPrice: clientAESDecrypt(item.itemPrice),
-        itemQuantity: clientAESDecrypt(item.itemQuantity),
-        itemImage: clientAESDecrypt(item.itemImage),
-        itemCategory: clientAESDecrypt(item.itemCategory),
-      };
+      const decrypted = await JSON.parse(await getItemDetails(itemID));
       setProduct(decrypted);
     }
     fetch1();

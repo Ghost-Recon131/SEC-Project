@@ -1,12 +1,9 @@
 import { getGlobalState, setGlobalState } from "components/utils/globalState";
 import axios from "axios";
 import { useState } from "react";
-import cookie from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import {
-  clientAESDecrypt,
-  clientAESEncrypt,
-} from "../security/EncryptionUtils";
+import {clientAESDecrypt, clientAESEncrypt,} from "../security/EncryptionUtils";
+import {getUserDetails} from "../utils/getUserDetails";
 
 export default function Component() {
   var [formData, setFormData] = useState({ username: "", password: "" });
@@ -32,33 +29,17 @@ export default function Component() {
 
     // Post login info to backend
     try {
-      const res = await axios.post(
-        getGlobalState("backendDomain") +
-          "/api/RegisterLogin/login?sessionID=" +
-          sessionID,
-        data
-      );
+      const res = await axios.post(getGlobalState("backendDomain") + "/api/RegisterLogin/login?sessionID=" + sessionID, data);
       const token = res.data.token;
       // Set the JWT token in session storage, then take user back to home
       if (token.startsWith("Bearer ")) {
         localStorage.setItem("jwt-token", token);
 
-        // Get the user's account info using JWT token
-        const getUserDetails = await axios.get(
-          getGlobalState("backendDomain") +
-            "/api/authorised/viewAccountInfo?sessionID=" +
-            sessionID,
-          { headers: { Authorization: token } }
-        );
-        let encryptedUserDetails = getUserDetails.data;
-        localStorage.setItem(
-          "user",
-          clientAESDecrypt(encryptedUserDetails.email)
-        );
-        localStorage.setItem(
-          "userID",
-          clientAESDecrypt(encryptedUserDetails.id)
-        );
+        // Get the user's account info and set a few more helper values
+        const userDetails = JSON.parse(await getUserDetails());
+        localStorage.setItem("user", userDetails.email);
+        localStorage.setItem("userID", userDetails.id);
+
         // Take user back to home after successful login
         navigate("/");
         setError("");

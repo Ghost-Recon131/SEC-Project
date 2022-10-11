@@ -3,6 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import {clientAESDecrypt, clientAESEncrypt} from "../security/EncryptionUtils";
+import {getItemDetails} from "../utils/getItemDetails";
 
 export default function Component() {
     // Initialise variables
@@ -44,30 +45,7 @@ export default function Component() {
             navigate("/signin");
         }else{
             async function getExistingItemData(){
-                const data = {
-                    itemID: clientAESEncrypt(itemID),
-                    sellerID: "",
-                    category: "",
-                };
-
-                let item = await axios.post(
-                    getGlobalState("backendDomain") +
-                    "/api/catalogue/viewItem?sessionID=" +
-                    sessionID,
-                    data
-                );
-                item = item.data;
-                const decrypted = {
-                    itemID: clientAESDecrypt(item.itemID),
-                    sellerID: clientAESDecrypt(item.sellerID),
-                    itemName: clientAESDecrypt(item.itemName),
-                    itemDescription: clientAESDecrypt(item.itemDescription),
-                    itemAvailable: clientAESDecrypt(item.itemAvailable),
-                    itemPrice: clientAESDecrypt(item.itemPrice),
-                    itemQuantity: clientAESDecrypt(item.itemQuantity),
-                    itemImage: clientAESDecrypt(item.itemImage),
-                    itemCategory: clientAESDecrypt(item.itemCategory),
-                };
+                const decrypted = await JSON.parse(await getItemDetails(itemID));
                 setFormData(decrypted);
             }getExistingItemData();
         }
