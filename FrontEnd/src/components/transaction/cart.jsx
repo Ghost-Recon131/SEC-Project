@@ -1,7 +1,7 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getItemDetails } from "../utils/getItemDetails";
-import { removeItemFromCart, removeItemsFromCart } from "../utils/shoppingCart";
+import { removeItemsFromCart } from "../utils/shoppingCart";
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'

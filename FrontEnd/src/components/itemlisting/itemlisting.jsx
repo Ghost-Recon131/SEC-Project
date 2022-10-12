@@ -30,6 +30,7 @@ export default function Component() {
   // Add item to cart
   function addToCart(){
     addItemToCart(product);
+    window.location.reload();
   }
 
   // Ask user to confirm disabling their listing

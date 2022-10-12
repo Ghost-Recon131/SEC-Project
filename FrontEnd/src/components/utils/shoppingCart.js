@@ -32,42 +32,25 @@ export function addItemToCart(item){
 
         // Finally, save the new cart in local storage
         localStorage.setItem("cart", JSON.stringify(cart));
+
+        // Update the number of items in cart
+        let existingCount = parseInt(localStorage.getItem("cartQuantity"));
+        if(existingCount){
+            existingCount += 1;
+        }else{
+            existingCount = 1;
+        }
+        localStorage.setItem("cartQuantity", existingCount.toString());
     }else{
         // When card is empty or doesn't exist, create a new one and add the item to cart
         let cartList = [];
         cartList.push(newItem);
+
+        // Generate cart quantity counter
         localStorage.setItem("cart", JSON.stringify(cartList));
+        localStorage.setItem("cartQuantity", "1")
     }
 }
-
-
-// This function removes an item from cart, takes a parameter of the item to be removed
-export function removeItemFromCart(item){
-    // Get our current cart items
-    let cart = [];
-    const userCart = localStorage.getItem("cart");
-    const cartItems = JSON.parse(userCart);
-
-    // Set the item that the user selected
-    const itemSelected = {"itemID": item.itemID, "quantity": 1};
-
-    // Search for the item then remove 1 quantity when there is more than 1 quantity of it
-    // if there is only 1 quantity we simply do not add it to the cart array
-    cartItems.forEach((cartItem) => {
-        if ((cartItem.itemID === itemSelected.itemID) && (cartItem.quantity > 1)){
-            cartItem.quantity -= 1;
-            cart.push(cartItem);
-        }
-
-        // Add the other items to the cart array as they are not effected
-        if (cartItem.itemID !== itemSelected.itemID){
-            cart.push(cartItem);
-        }
-    });
-    // Save the new cart in local storage
-    localStorage.setItem("cart", JSON.stringify(cart));
-}
-
 
 // Remove all copies of an item from cart
 export function removeItemsFromCart(item){
@@ -77,12 +60,26 @@ export function removeItemsFromCart(item){
     const cartItems = JSON.parse(userCart);
 
     // Add the other items that the user didn't want to remove to the cart array
+    let amountRemoved = 0;
     cartItems.forEach((cartItem) => {
-        if (cartItem.itemID !== item){
+        if(cartItem.itemID !== item){
             cart.push(cartItem);
         }
+
+        // Get the number of items removed
+        if(cartItem.itemID === item){
+            amountRemoved = cartItem.quantity;
+        }
     });
+    // Save the new cart without the item removed
     localStorage.setItem("cart", JSON.stringify(cart));
+
+    // Update the current count
+    let existingCount = parseInt(localStorage.getItem("cartQuantity"));
+    if(existingCount){
+        existingCount = existingCount - amountRemoved;
+    }
+    localStorage.setItem("cartQuantity", existingCount.toString());
 }
 
 

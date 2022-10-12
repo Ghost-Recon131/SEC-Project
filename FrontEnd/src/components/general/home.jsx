@@ -13,7 +13,6 @@ export default function Component() {
   useEffect(() => {
     if (!localStorage.getItem("sessionID")) {
       keyExchange().then((r) => window.location.reload());
-      // window.location.reload()
       console.log("key exchange");
     } else {
       // Get our session ID

@@ -7,6 +7,7 @@ export default function Component({ item }) {
   function addToCart(e) {
     e.preventDefault();
     addItemToCart(item);
+    window.location.reload();
   }
 
   return (
