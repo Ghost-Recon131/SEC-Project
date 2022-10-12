@@ -57,7 +57,7 @@ public class TransactionService {
     public String saveTransaction(TransactionRequest request){
         String result = "";
         try{
-            Transactions transaction = new Transactions(request.getItemID(), request.getBuyerID(), request.getSellerID(), request.getTotalCost());
+            Transactions transaction = new Transactions(request.getItemID(), request.getSellerID(), request.getBuyerID(), request.getTotalCost());
             transactionRepository.save(transaction);
             result = "Transaction saved successfully";
         }catch (Exception e){

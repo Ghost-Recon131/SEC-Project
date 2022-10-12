@@ -65,13 +65,10 @@ public class TransactionController {
 
         try{
             String sessionKey = sessionKeyService.getAESKey(sessionID);
-            // In this case, we'll be using TransactionID to store the itemID, this saves us from creating a new object type
-            Long itemID = typeConvertUtil.convertToLong(encryptionUtil.serverAESDecrypt(sessionKey, transaction.getTransactionID()));
-            Long buyerID = typeConvertUtil.convertToLong(encryptionUtil.serverAESDecrypt(sessionKey, transaction.getBuyerID()));
+            Long itemID = typeConvertUtil.convertToLong(encryptionUtil.serverAESDecrypt(sessionKey, transaction.getItemID()));
             Long sellerID = typeConvertUtil.convertToLong(encryptionUtil.serverAESDecrypt(sessionKey, transaction.getSellerID()));
             Double totalCost = typeConvertUtil.convertToDouble(encryptionUtil.serverAESDecrypt(sessionKey, transaction.getTotalCost()));
-
-            TransactionRequest transactionRequest = new TransactionRequest(itemID, userID, sellerID, totalCost);
+            TransactionRequest transactionRequest = new TransactionRequest(itemID, sellerID, userID, totalCost);
             result = transactionService.saveTransaction(transactionRequest);
         }catch (Exception e){
             logger.error("Error in decrypting transaction details");
