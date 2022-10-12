@@ -71,6 +71,7 @@ export default function Component() {
                     <p>Price: ${purchaseHistory.price} {purchaseHistory.totalCost}</p>
                     <p>Time of purchase: {purchaseHistory.transactionDate}</p>
                     <p>Seller's ID: {purchaseHistory.sellerID}</p>
+                    <br></br>
                 </div>
             ))}
 
@@ -85,6 +86,7 @@ export default function Component() {
                     <p>Price: ${itemSoldHistory.price} {itemSoldHistory.totalCost}</p>
                     <p>Time of purchase: {itemSoldHistory.transactionDate}</p>
                     <p>Buyer's ID: {itemSoldHistory.buyerID}</p>
+                    <br></br>
                 </div>
             ))}
         </div>
