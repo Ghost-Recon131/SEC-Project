@@ -92,6 +92,7 @@ export default function Component({ totalPrice }) {
        // On successful transaction, clear the cart
        if(response === "Transaction saved successfully"){
          localStorage.removeItem("cart");
+         localStorage.setItem("cartQuantity", "0");
          navigate("/viewtransactions")
        }
       }catch (e){

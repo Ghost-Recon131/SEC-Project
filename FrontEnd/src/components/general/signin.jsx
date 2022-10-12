@@ -39,6 +39,7 @@ export default function Component() {
         const userDetails = JSON.parse(await getUserDetails());
         localStorage.setItem("user", userDetails.email);
         localStorage.setItem("userID", userDetails.id);
+        localStorage.setItem("cartQuantity", "0");
 
         // Take user back to home after successful login
         navigate("/");

@@ -35,7 +35,7 @@ export function addItemToCart(item){
 
         // Update the number of items in cart
         let existingCount = parseInt(localStorage.getItem("cartQuantity"));
-        if(existingCount){
+        if(existingCount && existingCount > 0){
             existingCount += 1;
         }else{
             existingCount = 1;
